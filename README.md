@@ -26,7 +26,7 @@ App-specific config may follow, overriding the house style.
 
 ## JavaScript
 
-We use [ESLint](https://eslint.org) for our JavaScript. You'll need eslint 9 or higher to use our shared config.
+We use [ESLint](https://eslint.org) for our JavaScript. You'll need eslint 10 or higher to use our shared config, which requires Node 20.19 or newer.
 
 The configurations is based on @eslint/js's [recommended](https://github.com/eslint/eslint/blob/main/packages/js/src/configs/eslint-recommended.js) config,
 with a few more stylistic rules added to reflect our preferences.
@@ -62,7 +62,7 @@ export default [
 
 ## SCSS
 
-We use [Stylelint](https://stylelint.io) for our SCSS.
+We use [Stylelint](https://stylelint.io) for our SCSS. You'll need Stylelint 17 or higher to use our shared config.
 
 Our config extends [stylelint-config-recommended-scss](https://github.com/stylelint-scss/stylelint-config-recommended-scss) and makes it a little more lax.
 

@@ -7,13 +7,13 @@ Gem::Specification.new do |s|
 
   s.license = "MIT"
 
-  s.version = "1.2.1"
+  s.version = "1.3.0"
   s.platform = Gem::Platform::RUBY
 
-  s.add_dependency "rubocop", ">= 1.72"
-  s.add_dependency "rubocop-rails", ">= 2.30"
-  s.add_dependency "rubocop-performance", ">= 1.24"
-  s.add_dependency "rubocop-minitest", ">= 0.37.0"
+  s.add_dependency "rubocop", ">= 1.92"
+  s.add_dependency "rubocop-rails", ">= 2.38"
+  s.add_dependency "rubocop-performance", ">= 1.27"
+  s.add_dependency "rubocop-minitest", ">= 0.41"
 
   s.files = %w[ rubocop.yml rubocop-ruby.yml lib/rubocop-37signals.rb ]
 end
