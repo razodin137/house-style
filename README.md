@@ -1,25 +1,25 @@
-# 37signals house style
+# razodin137 house style
 
 ## Ruby
 
 RuboCop has built-in support for pulling config from a gem. We provide a
-`rubocop-37signals` gem for this purpose.
+`rubocop-razodin137` gem for this purpose.
 
-To introduce our house style to an app, add `rubocop-37signals` to your Gemfile:
+To introduce our house style to an app, add `rubocop-razodin137` to your Gemfile:
 ```ruby
-gem "rubocop-37signals", github: "razodin137/house-style", require: false
+gem "rubocop-razodin137", github: "razodin137/house-style", require: false
 ```
 
-And create a boilerplate `.rubocop.yml` that inherits from `rubocop-37signals`:
+And create a boilerplate `.rubocop.yml` that inherits from `rubocop-razodin137`:
 ```yaml
-# 37signals house style
-inherit_gem: { rubocop-37signals: rubocop.yml }
+# razodin137 house style
+inherit_gem: { rubocop-razodin137: rubocop.yml }
 ```
 
 ### For non-Rails apps:
 ```yaml
-# 37signals house style
-inherit_gem: { rubocop-37signals: rubocop-ruby.yml }
+# razodin137 house style
+inherit_gem: { rubocop-razodin137: rubocop-ruby.yml }
 ```
 
 App-specific config may follow, overriding the house style.
@@ -29,24 +29,26 @@ App-specific config may follow, overriding the house style.
 We use [ESLint](https://eslint.org) for our JavaScript. You'll need eslint 10 or higher to use our shared config, which requires Node 20.19 or newer.
 
 The configurations is based on @eslint/js's [recommended](https://github.com/eslint/eslint/blob/main/packages/js/src/configs/eslint-recommended.js) config,
-with a few more stylistic rules added to reflect our preferences.
+with a few more stylistic and correctness rules added to reflect our preferences.
 
-To use our ruleset as a baseline, add the `@37signals/eslint-config` package:
+It also wires in the `unused-imports` plugin so that `eslint --fix` deletes unused imports; a `_` prefix marks variables that are unused on purpose.
+
+To use our ruleset as a baseline, add the `@razodin137/eslint-config` package:
 
 ```bash
-npm install --save-dev @37signals/eslint-config
+npm install --save-dev @razodin137/eslint-config
 ```
 
 Or with Yarn:
 
 ```bash
-yarn add --dev @37signals/eslint-config
+yarn add --dev @razodin137/eslint-config
 ```
 
 And extend it in your eslint.config.mjs file:
 
 ```js
-import houseStyle from "@37signals/eslint-config"
+import houseStyle from "@razodin137/eslint-config"
 
 export default [
   houseStyle,
@@ -68,17 +70,17 @@ Our config extends [stylelint-config-recommended](https://github.com/stylelint/s
 
 To see the rules, read the [config itself](/stylelint-config-css/index.js).
 
-To use our small ruleset as a baseline, add the `@37signals/stylelint-config-css` package:
+To use our small ruleset as a baseline, add the `@razodin137/stylelint-config-css` package:
 ```bash
-npm install --save-dev @37signals/stylelint-config-css
+npm install --save-dev @razodin137/stylelint-config-css
 
 # or
-yarn add --dev @37signals/stylelint-config-css
+yarn add --dev @razodin137/stylelint-config-css
 ```
 And extend it in your Stylelint config:
 ```json
 {
-  "extends": "@37signals/stylelint-config-css",
+  "extends": "@razodin137/stylelint-config-css",
 
   "rules": {
     …
@@ -96,23 +98,54 @@ Our config extends [stylelint-config-recommended-scss](https://github.com/stylel
 
 To see the rules, read the [config itself](/stylelint-config-scss/index.js).
 
-To use our small ruleset as a baseline, add the `@37signals/stylelint-config-scss` package:
+To use our small ruleset as a baseline, add the `@razodin137/stylelint-config-scss` package:
 ```bash
-npm install --save-dev @37signals/stylelint-config-scss
+npm install --save-dev @razodin137/stylelint-config-scss
 
 # or
-yarn add --dev @37signals/stylelint-config-scss
+yarn add --dev @razodin137/stylelint-config-scss
 ```
 And extend it in your Stylelint config:
 ```json
 {
-  "extends": "@37signals/stylelint-config-scss",
+  "extends": "@razodin137/stylelint-config-scss",
 
   "rules": {
     …
   }
 }
 ```
+
+## Formatting
+
+What the formatter owns stays out of the linter, so nothing fights the fixer. Stylelint's own formatting rules are deprecated, and [Prettier](https://prettier.io) is their recommended replacement, so we use it to format our CSS and SCSS. You'll need Prettier 3 or higher to use our shared config, which requires Node 20.19 or newer.
+
+HTML and JavaScript are deliberately out of scope. Prettier always writes void elements as `<br />` with no option to omit the slash, which would fight our html-validate `void-style: omit` rule, so never point it at `.html` files. And it can't express the house's spaced array brackets, so never point it at `.js` files either — those stay with the `@stylistic/js` rules and `eslint --fix`.
+
+To use our defaults, add the `@razodin137/prettier-config` package and reference it from `package.json`:
+
+```bash
+npm install --save-dev prettier @razodin137/prettier-config
+```
+
+```json
+{
+  "prettier": "@razodin137/prettier-config"
+}
+```
+
+Editor plugins pick that key up automatically. Then gate formatting on the two file types:
+
+```json
+{
+  "scripts": {
+    "format:check": "prettier --check \"**/*.{css,scss}\"",
+    "format": "prettier --write \"**/*.{css,scss}\""
+  }
+}
+```
+
+The [fixtures](/prettier-config/fixtures) pin the defaults: `good.{css,scss}` are already formatted, and Prettier rewrites `bad.{css,scss}` into exactly their pinned good output — 2-space indent, double quotes, lines reflowed at 80. Run them from the package directory with `npm test`.
 
 ## HTML
 
@@ -122,18 +155,18 @@ The configuration is based on the [recommended preset](https://html-validate.org
 
 To see the rules, read the [config itself](/html-validate-config/index.js).
 
-To use our ruleset as a baseline, add the `@37signals/html-validate-config` package:
+To use our ruleset as a baseline, add the `@razodin137/html-validate-config` package:
 ```bash
-npm install --save-dev @37signals/html-validate-config
+npm install --save-dev @razodin137/html-validate-config
 
 # or
-yarn add --dev @37signals/html-validate-config
+yarn add --dev @razodin137/html-validate-config
 ```
 
 And extend it in your `.htmlvalidate.json`:
 ```json
 {
-  "extends": [ "@37signals/html-validate-config" ],
+  "extends": [ "@razodin137/html-validate-config" ],
 
   "rules": {
     …

@@ -1,4 +1,4 @@
-# 37signals house style for Python — project overrides go below.
+# razodin137 house style for Python — project overrides go below.
 # The formatter owns the style layer; the linter owns correctness.
 # Vendor this file with lint.sh and gate with: ./lint.sh
 

@@ -1,0 +1,22 @@
+.card {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    font-family: 'Helvetica Neue', Helvetica, sans-serif;
+}
+
+.card__title, .card__subtitle, .card__description, .card__meta, .card__byline {
+    color: var(--ink);
+}
+
+.card__title {
+    color: var(--ink);
+    grid-column: 1;
+    border-bottom: 1px solid rgba(15, 30, 45, 0.12);
+}
+
+@media (min-width: 40em) {
+    .card__title a {
+        color: inherit;
+        text-decoration: none;
+    }
+}

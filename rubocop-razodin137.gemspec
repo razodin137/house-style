@@ -1,8 +1,8 @@
 Gem::Specification.new do |s|
-  s.name = "rubocop-37signals"
-  s.summary = "37signals house style for Ruby programming"
-  s.author = "37signals"
-  s.email = "support@37signals.com"
+  s.name = "rubocop-razodin137"
+  s.summary = "razodin137 house style for Ruby programming"
+  s.author = "razodin137"
+  s.email = "razodin137@users.noreply.github.com"
   s.homepage = "https://github.com/razodin137/house-style"
 
   s.license = "MIT"
@@ -15,5 +15,5 @@ Gem::Specification.new do |s|
   s.add_dependency "rubocop-performance", ">= 1.27"
   s.add_dependency "rubocop-minitest", ">= 0.41"
 
-  s.files = %w[ rubocop.yml rubocop-ruby.yml lib/rubocop-37signals.rb ]
+  s.files = %w[ rubocop.yml rubocop-ruby.yml lib/rubocop-razodin137.rb ]
 end

@@ -1,9 +1,9 @@
 {
-  "name": "@37signals/stylelint-config-scss",
+  "name": "@razodin137/stylelint-config-scss",
   "version": "0.1.0",
-  "author": "37signals",
+  "author": "razodin137",
   "license": "MIT",
-  "description": "37signals house style for SCSS",
+  "description": "razodin137 house style for SCSS",
   "keywords": [
     "stylelint",
     "stylelint-config",

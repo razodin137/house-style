@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 37signals house style for Python.
+# razodin137 house style for Python.
 # ruff check gates on correctness (ruff's default rule set); ruff
 # format pins the house formatting — double quotes, 2-space indent.
 # Vendor this file with ruff.toml and gate with: ./lint.sh

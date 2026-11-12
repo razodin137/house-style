@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 37signals house style for shell.
+# razodin137 house style for shell.
 # ShellCheck gates at info severity (that's where 0.11 puts unquoted
 # expansions — the bug that breaks gate scripts); style stays advisory.
 # shfmt pins formatting to a 2-space indent. Vendor this file with

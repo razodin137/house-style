@@ -1,5 +1,5 @@
 /*
- * One violation per rule enforced by @37signals/stylelint-config-css.
+ * One violation per rule enforced by @razodin137/stylelint-config-css.
  *
  * Two enabled rules cannot fire in this file: "comment-no-empty" is turned
  * off by this config (see fixtures/good.css), and "no-empty-source" only

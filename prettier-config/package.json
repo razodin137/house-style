@@ -1,0 +1,39 @@
+{
+  "name": "@razodin137/prettier-config",
+  "version": "0.1.0",
+  "author": "razodin137",
+  "license": "MIT",
+  "description": "razodin137 house style for formatting CSS and SCSS",
+  "keywords": [
+    "prettier",
+    "prettier-config",
+    "css",
+    "scss"
+  ],
+  "homepage": "https://github.com/razodin137/house-style",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/razodin137/house-style.git",
+    "directory": "prettier-config"
+  },
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "index.js",
+  "files": [
+    "index.js"
+  ],
+  "scripts": {
+    "test": "node test/verify.mjs"
+  },
+  "devDependencies": {
+    "prettier": "^3.10.1"
+  },
+  "peerDependencies": {
+    "prettier": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  }
+}
