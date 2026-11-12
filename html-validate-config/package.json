@@ -23,6 +23,9 @@
   "files": [
     "index.js"
   ],
+  "scripts": {
+    "test": "node test/verify.mjs"
+  },
   "devDependencies": {
     "html-validate": "^11.21.0"
   },

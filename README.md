@@ -113,3 +113,33 @@ And extend it in your Stylelint config:
   }
 }
 ```
+
+## HTML
+
+We use [html-validate](https://html-validate.org) for our HTML. You'll need html-validate 11 or higher to use our shared config, which requires Node 22.22 or newer.
+
+The configuration is based on the [recommended preset](https://html-validate.org/rules/presets.html), with a few more rules added to reflect our preferences.
+
+To see the rules, read the [config itself](/html-validate-config/index.js).
+
+To use our ruleset as a baseline, add the `@37signals/html-validate-config` package:
+```bash
+npm install --save-dev @37signals/html-validate-config
+
+# or
+yarn add --dev @37signals/html-validate-config
+```
+
+And extend it in your `.htmlvalidate.json`:
+```json
+{
+  "extends": [ "@37signals/html-validate-config" ],
+
+  "rules": {
+    …
+  }
+}
+```
+
+The [fixtures](/html-validate-config/fixtures) pin the ruleset: `good.html` passes clean, and `bad.html` fails with one violation per rule. Run them from the package directory with `npm test`.
+
