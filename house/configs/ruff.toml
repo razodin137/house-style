@@ -1,0 +1,26 @@
+# razodin137 house style for Python — project overrides go below.
+# The formatter owns the style layer; the linter owns correctness.
+# Vendor this file with lint.sh and gate with: ./lint.sh
+
+# The house DNA, same as the JavaScript rules: double quotes,
+# 2-space indent. Everything else stays Black-canonical.
+indent-width = 2
+
+[format]
+# "foo" not 'foo', unless escaping is required.
+quote-style = "double"
+
+# Spaces, never tabs.
+indent-style = "space"
+
+# The lint baseline is ruff's own default rule set — pyflakes plus a
+# curated slice of correctness rules (bugbear, isort, pyupgrade, …).
+# What the formatter owns (indent, quotes, whitespace, line length)
+# stays out of the linter, so nothing fights the fixer. Unused
+# arguments are allowed, matching the JavaScript no-unused-vars
+# with args: none.
+[lint]
+# Gate scripts read returncodes on purpose — a subprocess call that
+# wants check=True says so, and the ones that don't are the point of
+# the gate. The only relaxation; everything else is ruff's defaults.
+ignore = [ "PLW1510" ]

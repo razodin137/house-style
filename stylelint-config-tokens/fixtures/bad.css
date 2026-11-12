@@ -1,0 +1,14 @@
+/*
+ * One violation per rule enforced by @razodin137/stylelint-config-tokens.
+ *
+ * Token definitions themselves are exempt: "--brand" fails the vocabulary
+ * rule, while the raw value it holds is never asked for var().
+ */
+
+:root {
+  --brand: #b3261e;
+}
+
+.broken {
+  color: #1a1a1a;
+}

@@ -90,6 +90,37 @@ And extend it in your Stylelint config:
 
 The [fixtures](/stylelint-config-css/fixtures) pin the ruleset: `good.css` passes clean, and `bad.css` fails with one violation per rule. Run them from the package directory with `npm test`.
 
+## Design tokens
+
+The CSS and SCSS configs check syntax. They cannot tell you that a colour or a font came from somewhere other than the token sheet — "every colour and font comes through a token" is a design rule, not a parse rule.
+
+`@razodin137/stylelint-config-tokens` adds that lane. It is syntax-agnostic, so it layers over either config:
+
+```bash
+npm install --save-dev @razodin137/stylelint-config-tokens
+```
+
+```json
+{
+  "extends": [
+    "@razodin137/stylelint-config-css",
+    "@razodin137/stylelint-config-tokens"
+  ],
+
+  "rules": {
+    …
+  }
+}
+```
+
+Swap in `@razodin137/stylelint-config-scss` for an SCSS project; the token rules are the same.
+
+Two rules do the work. `scale-unlimited/declaration-strict-value` requires `var()` for every colour property (matched by name, vendor prefixes included), plus `fill`, `stroke`, and `font-family`. Values with their own meaning — `inherit`, `currentColor`, `transparent`, `none` — still pass, and `@font-face` may name the family it defines. Token definitions themselves are exempt, so a raw value is legal exactly once, where the token is declared.
+
+`custom-property-pattern` keeps the vocabulary fixed: custom properties must be `--color-*`, `--space-*`, or `--text-*`. Widen the pattern in your project config when you add a namespace such as `--radius-*`.
+
+The [fixtures](/stylelint-config-tokens/fixtures) pin the lane: `good.css` passes clean, and `bad.css` fails with one violation per rule. Run them from the package directory with `npm test`.
+
 ## SCSS
 
 We use [Stylelint](https://stylelint.io) for our SCSS. You'll need Stylelint 17 or higher to use our shared config.
@@ -215,6 +246,41 @@ And extend it in your `.htmlvalidate.json`:
 ```
 
 The [fixtures](/html-validate-config/fixtures) pin the ruleset: `good.html` passes clean, and `bad.html` fails with one violation per rule. Run them from the package directory with `npm test`.
+
+## Screenshots
+
+Text linters cannot see a layout. A page can pass every rule above and still collapse at 390px, with a day label printing on top of its sentence. `@razodin137/shot` renders the page and compares it with a baseline at 390, 1280, 1440, and 1920.
+
+Install the command and its browser:
+
+```bash
+npm install --save-dev @razodin137/shot
+npx playwright install chromium
+```
+
+Point it at a running site, or at local files:
+
+```bash
+npx house-shot http://localhost:3000/ --base-url http://localhost:3000
+```
+
+Add a `shot.config.mjs` for the usual pages:
+
+```js
+export default {
+  baseURL: "http://localhost:3000",
+  pages: [ "/", "/pricing" ],
+  widths: [ 390, 1280, 1440, 1920 ],
+  out: ".shot",
+  tolerance: 0.001
+}
+```
+
+The first run establishes baselines with `--update`; commit `.shot/`. Every later run compares each page at each width, writes `<width>.actual.png` and `<width>.diff.png` beside the failing baseline, and exits non-zero. `--tolerance` is the allowed ratio of differing pixels, 0.1% by default, so font anti-aliasing does not trip the gate while a moved box does.
+
+Shots are deterministic by construction: one device pixel per CSS pixel, light colour scheme, reduced motion, animations and transitions disabled, web fonts awaited before capture. Baselines still belong to the machine that drew them — regenerate them in the same container or CI image rather than across operating systems.
+
+The [fixtures](/shot/fixtures) pin the command: `good` and `bad` render identically at 1280 and up, while `bad` overprints its day labels at 390. `bad` is `good` with one mobile rule left behind — the row collapses, the children keep spanning. The test builds its baselines in `.test-output` at run time, so the package ships no screenshots that would only match one OS. Run it from the package directory with `npm test`.
 
 ## Shell
 

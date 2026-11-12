@@ -1,0 +1,60 @@
+/*
+ * This file passes @razodin137/stylelint-config-tokens cleanly.
+ *
+ * Tokens are defined here; everything that consumes a colour or a font
+ * family reads them through var(). Values that carry meaning on their own
+ * (inherit, currentColor, transparent, none) need no token.
+ */
+
+@property --color-brand {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #b3261e;
+}
+
+:root {
+  --color-brand: #b3261e;
+  --color-ink: #1a1a1a;
+  --color-paper: #ffffff;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --text-body: Helvetica, Arial, sans-serif;
+  --text-heading: "House Sans", Helvetica, sans-serif;
+}
+
+@font-face {
+  font-family: "House Sans";
+  src: url("house-sans.woff2") format("woff2");
+  font-display: swap;
+}
+
+body {
+  color: var(--color-ink);
+  background-color: var(--color-paper);
+  font-family: var(--text-body);
+  padding: var(--space-2);
+}
+
+h1 {
+  color: var(--color-brand);
+  font-family: var(--text-heading);
+  margin-block: var(--space-1) var(--space-2);
+}
+
+.icon {
+  fill: var(--color-ink);
+  stroke: none;
+}
+
+.icon--quiet {
+  fill: transparent;
+  stroke: currentColor;
+}
+
+.link {
+  color: inherit;
+}
+
+.rule {
+  outline-color: transparent;
+}

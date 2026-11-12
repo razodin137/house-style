@@ -1,0 +1,65 @@
+{
+  "name": "@razodin137/house",
+  "version": "0.1.0",
+  "author": "razodin137",
+  "license": "MIT",
+  "description": "One house check binary: detects lanes by file type and runs house check and house fix",
+  "keywords": [
+    "house-style",
+    "lint",
+    "format",
+    "check",
+    "fix",
+    "cli"
+  ],
+  "homepage": "https://github.com/razodin137/house-style",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/razodin137/house-style.git",
+    "directory": "house"
+  },
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "bin": {
+    "house": "bin/house.js"
+  },
+  "main": "src/cli.js",
+  "files": [
+    "bin",
+    "src",
+    "configs"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "peerDependencies": {
+    "@razodin137/eslint-config": ">=0.1.0",
+    "@razodin137/html-validate-config": ">=0.1.0",
+    "@razodin137/prettier-config": ">=0.1.0",
+    "@razodin137/stylelint-config-css": ">=0.1.0",
+    "@razodin137/stylelint-config-scss": ">=0.1.0"
+  },
+  "peerDependenciesMeta": {
+    "@razodin137/eslint-config": {
+      "optional": true
+    },
+    "@razodin137/html-validate-config": {
+      "optional": true
+    },
+    "@razodin137/prettier-config": {
+      "optional": true
+    },
+    "@razodin137/stylelint-config-css": {
+      "optional": true
+    },
+    "@razodin137/stylelint-config-scss": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  }
+}

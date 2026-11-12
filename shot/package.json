@@ -1,0 +1,40 @@
+{
+  "name": "@razodin137/shot",
+  "version": "0.1.0",
+  "author": "razodin137",
+  "license": "MIT",
+  "description": "razodin137 house shot command for visual regressions",
+  "keywords": [
+    "playwright",
+    "screenshot",
+    "visual-regression"
+  ],
+  "homepage": "https://github.com/razodin137/house-style",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/razodin137/house-style.git",
+    "directory": "shot"
+  },
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "bin": {
+    "house-shot": "./shot.mjs"
+  },
+  "files": [
+    "shot.mjs"
+  ],
+  "scripts": {
+    "test": "node test/verify.mjs"
+  },
+  "dependencies": {
+    "pixelmatch": "^8.0.0",
+    "playwright": "^1.65.0",
+    "pngjs": "^7.0.0"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  }
+}

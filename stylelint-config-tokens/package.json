@@ -1,0 +1,41 @@
+{
+  "name": "@razodin137/stylelint-config-tokens",
+  "version": "0.1.0",
+  "author": "razodin137",
+  "license": "MIT",
+  "description": "razodin137 house style for design tokens",
+  "keywords": [
+    "stylelint",
+    "stylelint-config",
+    "design-tokens"
+  ],
+  "homepage": "https://github.com/razodin137/house-style",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/razodin137/house-style.git",
+    "directory": "stylelint-config-tokens"
+  },
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "index.js",
+  "files": [
+    "index.js"
+  ],
+  "scripts": {
+    "test": "node test/verify.mjs"
+  },
+  "dependencies": {
+    "stylelint-declaration-strict-value": "^1.13.0"
+  },
+  "devDependencies": {
+    "stylelint": "^17.16.0"
+  },
+  "peerDependencies": {
+    "stylelint": "^17.0.0"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  }
+}
