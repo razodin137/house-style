@@ -13,7 +13,7 @@ const CONFIG_PACKAGES = {
     main: "index.js",
     body: "module.exports = {}\n",
     files: {
-      "configs/recommended.json": JSON.stringify({ formatter: { enabled: true } }, null, 2) + "\n"
+      "configs/recommended.json": `${JSON.stringify({ formatter: { enabled: true } }, null, 2)}\n`
     }
   },
   "@razodin137/eslint-config": { main: "index.js", type: "module", body: "export default { rules: {} }\n" },
@@ -41,6 +41,19 @@ const failing = (process.env.HOUSE_FAIL_TOOL ?? "").split(",").filter(Boolean)
 if (failing.includes(tool)) {
   process.stdout.write("fake " + tool + " failure\\n")
   process.exit(1)
+}
+
+const stdinPath = args.indexOf("--stdin-filepath")
+if (tool === "prettier" && stdinPath !== -1) {
+  const path = args[stdinPath + 1] ?? ""
+  const extension = path.slice(path.lastIndexOf(".") + 1)
+  const formatted = {
+    css: "a {\\n  color: red;\\n}",
+    js: "const value = 1",
+    json: "{\\n  \\"a\\": 1\\n}"
+  }[extension]
+  process.stdout.write((formatted ?? "") + "\\n")
+  process.exit(0)
 }
 
 process.stdout.write("fake " + tool + " ok\\n")

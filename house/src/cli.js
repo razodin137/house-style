@@ -255,7 +255,10 @@ function runLanes(toRun, command, cwd, values, color) {
 
   for (const { lane, files: laneFiles } of toRun) {
     const config = resolveLaneConfig(lane.id, cwd)
-    const prettier = lane.id === "css" || lane.id === "scss" ? resolvePrettierConfig(cwd) : null
+    const prettier =
+      lane.id === "css" || lane.id === "scss" || lane.id === "html"
+        ? resolvePrettierConfig(cwd)
+        : null
     const error = config.error ?? prettier?.error ?? null
 
     if (error) {

@@ -21,7 +21,7 @@ house fix src lib      # only these paths
 house check            # the read-only gate CI should run
 ```
 
-Fixers cover `eslint --fix`, `stylelint --fix`, `prettier --write`, `html-validate --fix`, `biome format --write`, `rubocop -a`, `shfmt -w`, and `ruff check --fix` plus `ruff format`. Exit `0` means the tree is clean, `1` means something remains that needs a source change, and `2` means a lane has files but no config or tool.
+Fixers cover `eslint --fix`, `stylelint --fix`, `prettier --write`, `html-validate --fix`, `biome format --write`, `rubocop -a`, `shfmt -w`, and `ruff check --fix` plus `ruff format`. For `.html` files, `prettier --write` rewrites the contents of `<style>` and `<script>` blocks but never the markup. Exit `0` means the tree is clean, `1` means something remains that needs a source change, and `2` means a lane has files but no config or tool.
 
 ### Optional pre-commit hook
 
@@ -36,19 +36,19 @@ The hook fixes only the files staged for the commit and stages the result. It ne
 
 ## Lanes
 
-Lanes are chosen by file type, not by language. That matters at the edges: a `.css` file is always checked with the CSS Stylelint config and never with the SCSS one, and an HTML project with no JavaScript still gets its HTML checked.
+Lanes are chosen by file type, not by language. That matters at the edges: a `.css` file is always checked with the CSS Stylelint config and never with the SCSS one, and an HTML project with no JavaScript still gets its HTML checked. The HTML lane formats embedded `<style>` and `<script>` bodies with Prettier, but never the markup: Prettier's lowercased doctype and `<br />` output would fight `doctype-style: uppercase` and `void-style: omit`.
 
-| Lane     | Files                                                            | Check steps                                   | Fix steps                                         |
-| -------- | ---------------------------------------------------------------- | --------------------------------------------- | ------------------------------------------------- |
-| `js`     | `.js`, `.mjs`, `.cjs`, `.jsx`                                    | `eslint --max-warnings 0`                     | `eslint --fix`, then check                        |
-| `css`    | `.css`                                                           | `prettier --check`, `stylelint`               | `stylelint --fix`, `prettier --write`, then check |
-| `scss`   | `.scss`                                                          | `prettier --check`, `stylelint`               | `stylelint --fix`, `prettier --write`, then check |
-| `html`   | `.html`, `.htm`                                                  | `html-validate`                               | `html-validate --fix`, then check                 |
-| `md`     | `.md`, `.markdown`                                               | `biome format`                                | `biome format --write`, then check                |
-| `yaml`   | `.yaml`, `.yml`                                                  | `biome format`                                | `biome format --write`, then check                |
-| `ruby`   | `.rb`, `.rake`, `.gemspec`, `Gemfile`, `Rakefile`, ruby shebangs | `rubocop`                                     | `rubocop -a`, then check                          |
-| `shell`  | `.sh`, `.bash`, `.zsh`, `.ksh`, shell shebangs                   | `shellcheck --severity=info`, `shfmt -i 2 -d` | `shfmt -i 2 -w`, then check                       |
-| `python` | `.py`, `.pyi`, python shebangs                                   | `ruff check`, `ruff format --check`           | `ruff check --fix`, `ruff format`, then check     |
+| Lane     | Files                                                            | Check steps                                                          | Fix steps                                                                |
+| -------- | ---------------------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `js`     | `.js`, `.mjs`, `.cjs`, `.jsx`                                    | `eslint --max-warnings 0`                                            | `eslint --fix`, then check                                               |
+| `css`    | `.css`                                                           | `prettier --check`, `stylelint`                                      | `stylelint --fix`, `prettier --write`, then check                        |
+| `scss`   | `.scss`                                                          | `prettier --check`, `stylelint`                                      | `stylelint --fix`, `prettier --write`, then check                        |
+| `html`   | `.html`, `.htm`                                                  | `html-validate`, `prettier --check` on embedded `<style>`/`<script>` | `html-validate --fix`, `prettier --write` on embedded blocks, then check |
+| `md`     | `.md`, `.markdown`                                               | `biome format`                                                       | `biome format --write`, then check                                       |
+| `yaml`   | `.yaml`, `.yml`                                                  | `biome format`                                                       | `biome format --write`, then check                                       |
+| `ruby`   | `.rb`, `.rake`, `.gemspec`, `Gemfile`, `Rakefile`, ruby shebangs | `rubocop`                                                            | `rubocop -a`, then check                                                 |
+| `shell`  | `.sh`, `.bash`, `.zsh`, `.ksh`, shell shebangs                   | `shellcheck --severity=info`, `shfmt -i 2 -d`                        | `shfmt -i 2 -w`, then check                                              |
+| `python` | `.py`, `.pyi`, python shebangs                                   | `ruff check`, `ruff format --check`                                  | `ruff check --fix`, `ruff format`, then check                            |
 
 Ruby uses `bundle exec rubocop` when the project has a `Gemfile`.
 
@@ -62,7 +62,7 @@ For each lane, `house` uses this order:
 
 The bundled Ruby and Python configs are copies of the gem and vendored configs; the test suite pins them so they cannot drift.
 
-A lane with files but no config, or a lane whose tool is not installed, fails with exit code 2. It does not silently skip.
+A lane with files but no config, or a lane whose tool is not installed, fails with exit code 2. It does not silently skip. The HTML lane resolves a Prettier config as well as an html-validate config, because it formats the embedded `<style>` and `<script>` bodies.
 
 ## Files
 
@@ -128,4 +128,4 @@ With no context it signs off the default `signoff` status. `--fail` reports a fa
 npm test
 ```
 
-The tests run the real CLI against temporary projects with fake tools on `PATH`, so they pin lane detection, the CSS/SCSS split, config precedence, fix-then-verify order, and exit codes without depending on the linters being installed.
+The tests run the real CLI against temporary projects with fake tools on `PATH`, so they pin lane detection, the CSS/SCSS split, config precedence, fix-then-verify order, embedded-block formatting, and exit codes without depending on the linters being installed.

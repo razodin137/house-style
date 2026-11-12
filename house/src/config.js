@@ -109,6 +109,11 @@ function packageRoot(name, cwd) {
     directory = parent
   }
 
+  // Packages without a root export (e.g. @razodin137/biome-config) do not
+  // resolve through require(); look in the checkout root that owns house.
+  const checkout = join(dirname(houseRoot), "node_modules", ...name.split("/"))
+  if (existsSync(join(checkout, "package.json"))) return checkout
+
   const bundled = join(houseRoot, "node_modules", ...name.split("/"))
   return existsSync(join(bundled, "package.json")) ? bundled : null
 }

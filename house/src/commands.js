@@ -1,5 +1,7 @@
 import { existsSync } from "node:fs"
 import { join } from "node:path"
+import { houseRoot } from "./paths.js"
+import { findTool } from "./run.js"
 
 function step(tool, args, label) {
   return { tool, args, label: label ?? tool }
@@ -41,19 +43,47 @@ function stylePlan(files, config, prettier, fix) {
   }
 }
 
-function htmlPlan(files, config, fix) {
-  const base = withConfig([], config)
+function embeddedPlan(files, prettier, cwd, fix) {
+  if (!findTool("prettier", cwd)) {
+    return { fix: [], check: [ step("prettier", [], "embedded blocks") ] }
+  }
+
+  const base = [ join(houseRoot, "src", "embedded.js"), ...withConfig([], prettier) ]
+  const run = (mode) => step(process.execPath, [ ...base, mode, ...files ], "embedded blocks")
 
   if (fix) {
     return {
-      fix: [ step("html-validate", [ ...base, "--fix", ...files ]) ],
-      check: [ step("html-validate", [ ...base, ...files ]) ]
+      fix: [ run("--write") ],
+      check: [ run("--check") ]
+    }
+  }
+
+  return { fix: [], check: [ run("--check") ] }
+}
+
+function htmlPlan(files, config, prettier, cwd, fix) {
+  const base = withConfig([], config)
+  const embedded = embeddedPlan(files, prettier, cwd, fix)
+
+  if (fix) {
+    return {
+      fix: [
+        step("html-validate", [ ...base, "--fix", ...files ]),
+        ...embedded.fix
+      ],
+      check: [
+        ...embedded.check,
+        step("html-validate", [ ...base, ...files ])
+      ]
     }
   }
 
   return {
     fix: [],
-    check: [ step("html-validate", [ ...base, ...files ]) ]
+    check: [
+      ...embedded.check,
+      step("html-validate", [ ...base, ...files ])
+    ]
   }
 }
 
@@ -129,7 +159,7 @@ function pythonPlan(files, config, fix) {
 export function buildPlan(lane, files, { config, prettier, cwd, fix }) {
   if (lane === "js") return eslintPlan(files, config, fix)
   if (lane === "css" || lane === "scss") return stylePlan(files, config, prettier, fix)
-  if (lane === "html") return htmlPlan(files, config, fix)
+  if (lane === "html") return htmlPlan(files, config, prettier, cwd, fix)
   if (lane === "md" || lane === "yaml") return biomePlan(files, config, fix)
   if (lane === "ruby") return rubyPlan(files, config, cwd, fix)
   if (lane === "shell") return shellPlan(files, fix)
