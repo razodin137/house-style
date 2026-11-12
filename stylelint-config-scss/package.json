@@ -9,10 +9,10 @@
     "stylelint-config",
     "scss"
   ],
-  "homepage": "https://github.com/basecamp/house-style",
+  "homepage": "https://github.com/razodin137/house-style",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/basecamp/house-style.git",
+    "url": "git+https://github.com/razodin137/house-style.git",
     "directory": "stylelint-config-scss"
   },
   "private": false,

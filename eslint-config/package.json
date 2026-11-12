@@ -11,16 +11,16 @@
   "main": "eslint.config.mjs",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/basecamp/house-style.git"
+    "url": "git+https://github.com/razodin137/house-style.git"
   },
   "private": false,
   "publishConfig": {
     "access": "public"
   },
   "bugs": {
-    "url": "https://github.com/basecamp/house-style/issues"
+    "url": "https://github.com/razodin137/house-style/issues"
   },
-  "homepage": "https://github.com/basecamp/house-style#readme",
+  "homepage": "https://github.com/razodin137/house-style",
   "dependencies": {
     "@eslint/js": "^10.0.1",
     "@stylistic/eslint-plugin": "^5.10.0",

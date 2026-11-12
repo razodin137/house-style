@@ -3,7 +3,7 @@ Gem::Specification.new do |s|
   s.summary = "37signals house style for Ruby programming"
   s.author = "37signals"
   s.email = "support@37signals.com"
-  s.homepage = "https://github.com/basecamp/house-style"
+  s.homepage = "https://github.com/razodin137/house-style"
 
   s.license = "MIT"
 

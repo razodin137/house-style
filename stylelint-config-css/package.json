@@ -1,0 +1,38 @@
+{
+  "name": "@37signals/stylelint-config-css",
+  "version": "0.1.0",
+  "author": "37signals",
+  "license": "MIT",
+  "description": "37signals house style for CSS",
+  "keywords": [
+    "stylelint",
+    "stylelint-config",
+    "css"
+  ],
+  "homepage": "https://github.com/razodin137/house-style",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/razodin137/house-style.git",
+    "directory": "stylelint-config-css"
+  },
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "index.js",
+  "files": [
+    "index.js"
+  ],
+  "dependencies": {
+    "stylelint-config-recommended": "^18.0.0"
+  },
+  "devDependencies": {
+    "stylelint": "^17.16.0"
+  },
+  "peerDependencies": {
+    "stylelint": "^17.0.0"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  }
+}

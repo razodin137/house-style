@@ -7,7 +7,7 @@ RuboCop has built-in support for pulling config from a gem. We provide a
 
 To introduce our house style to an app, add `rubocop-37signals` to your Gemfile:
 ```ruby
-gem "rubocop-37signals", github: "basecamp/house-style", require: false
+gem "rubocop-37signals", github: "razodin137/house-style", require: false
 ```
 
 And create a boilerplate `.rubocop.yml` that inherits from `rubocop-37signals`:
