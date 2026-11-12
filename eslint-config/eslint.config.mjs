@@ -1,6 +1,7 @@
 import js from "@eslint/js"
 import globals from "globals"
 import stylistic from "@stylistic/eslint-plugin"
+import e18e from "@e18e/eslint-plugin"
 import eslintComments from "@eslint-community/eslint-plugin-eslint-comments"
 import importPlugin from "eslint-plugin-import-x"
 import reactHooks from "eslint-plugin-react-hooks"
@@ -42,6 +43,7 @@ export default {
   },
   plugins: {
     "@stylistic/js": stylistic,
+    "e18e": e18e,
     "eslint-comments": eslintComments,
     "import": importPlugin,
     "react-hooks": reactHooks,
@@ -58,6 +60,7 @@ export default {
     "@stylistic/js/array-bracket-spacing": [ "error", "always" ],
     "@stylistic/js/arrow-parens": [ "error", "always" ],
     "@stylistic/js/comma-dangle": [ "error", "never" ],
+    "@stylistic/js/function-call-spacing": "error",
     "@stylistic/js/operator-linebreak": [ "error", "after", { "overrides": { "?": "before", ":": "before" } } ],
     "@stylistic/js/quote-props": "off",
     "@stylistic/js/quotes": [ "error", "double", { "avoidEscape": true } ],
@@ -75,6 +78,7 @@ export default {
     "grouped-accessor-pairs": "error",
     "guard-for-in": "error",
     "max-classes-per-file": [ "error", 1 ],
+    "new-cap": "error",
     "no-alert": "error",
     "no-array-constructor": "error",
     "no-bitwise": "error",
@@ -131,6 +135,7 @@ export default {
     "no-unused-expressions": [ "error", { "allowShortCircuit": true, "allowTernary": true, "allowTaggedTemplates": true } ],
     "no-unused-vars": "off",
     "no-use-before-define": [ "error", { "classes": false, "functions": false, "variables": true } ],
+    "no-useless-call": "error",
     "no-useless-catch": "error",
     "no-useless-computed-key": "error",
     "no-useless-concat": "error",
@@ -139,6 +144,7 @@ export default {
     "no-useless-return": "error",
     "no-var": "error",
     "no-void": "error",
+    "object-property-newline": [ "error", { "allowAllPropertiesOnSameLine": true } ],
     "object-shorthand": [ "error", "always", { "avoidQuotes": true, "ignoreConstructors": false } ],
     "one-var": [ "error", { "initialized": "never" } ],
     "prefer-arrow-callback": [ "error", { "allowNamedFunctions": false, "allowUnboundThis": true } ],
@@ -157,7 +163,25 @@ export default {
     "symbol-description": "error",
     "vars-on-top": "error",
     "yoda": [ "error", "never" ],
+    "e18e/prefer-array-at": "error",
+    "e18e/prefer-array-fill": "error",
+    "e18e/prefer-array-from-map": "error",
+    "e18e/prefer-array-some": "error",
+    "e18e/prefer-array-to-reversed": "error",
+    "e18e/prefer-array-to-sorted": "error",
+    "e18e/prefer-array-to-spliced": "error",
+    "e18e/prefer-date-now": "error",
+    "e18e/prefer-nullish-coalescing": "error",
+    "e18e/prefer-regex-test": "error",
+    "e18e/prefer-spread-syntax": "error",
+    "e18e/prefer-static-regex": "error",
+    "e18e/prefer-string-fromcharcode": "error",
+    "e18e/prefer-timer-args": "error",
+    "e18e/prefer-url-canparse": "error",
     "eslint-comments/no-unlimited-disable": "error",
+    "eslint-comments/no-aggregating-enable": "error",
+    "eslint-comments/no-duplicate-disable": "error",
+    "eslint-comments/no-unused-enable": "error",
     "import/export": "error",
     "import/extensions": [ "error", "ignorePackages", { "js": "always", "mjs": "always", "jsx": "never" } ],
     "import/first": "error",

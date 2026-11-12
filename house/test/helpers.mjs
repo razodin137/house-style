@@ -9,6 +9,13 @@ const bin = resolve(houseDir, "bin", "house.js")
 const scratch = join(here, ".tmp")
 
 const CONFIG_PACKAGES = {
+  "@razodin137/biome-config": {
+    main: "index.js",
+    body: "module.exports = {}\n",
+    files: {
+      "configs/recommended.json": JSON.stringify({ formatter: { enabled: true } }, null, 2) + "\n"
+    }
+  },
   "@razodin137/eslint-config": { main: "index.js", type: "module", body: "export default { rules: {} }\n" },
   "@razodin137/stylelint-config-css": { main: "index.js", body: "module.exports = { rules: {} }\n" },
   "@razodin137/stylelint-config-scss": { main: "index.js", body: "module.exports = { rules: {} }\n" },
@@ -64,6 +71,12 @@ export function makeProject({ files = {}, configs = true } = {}) {
       ...(pkg.type ? { type: pkg.type } : {})
     }))
     writeFileSync(join(directory, pkg.main), pkg.body)
+
+    for (const [ extraPath, extraBody ] of Object.entries(pkg.files ?? {})) {
+      const target = join(directory, extraPath)
+      mkdirSync(dirname(target), { recursive: true })
+      writeFileSync(target, extraBody)
+    }
   }
 
   spawnSync("git", [ "init", "-q" ], { cwd: root })
@@ -71,7 +84,7 @@ export function makeProject({ files = {}, configs = true } = {}) {
   return root
 }
 
-export function makeTools(root, names = [ "eslint", "stylelint", "prettier", "html-validate", "rubocop", "bundle", "shellcheck", "shfmt", "ruff", "gh" ]) {
+export function makeTools(root, names = [ "biome", "eslint", "stylelint", "prettier", "html-validate", "rubocop", "bundle", "shellcheck", "shfmt", "ruff", "gh" ]) {
   const directory = join(root, ".fake-bin")
   mkdirSync(directory, { recursive: true })
   writeFileSync(join(directory, ".fake-tool.cjs"), FAKE_TOOL_BODY)

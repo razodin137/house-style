@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs"
 import { createRequire } from "node:module"
-import { join } from "node:path"
+import { dirname, join } from "node:path"
 import { houseRoot } from "./paths.js"
 
 const STYLELINT_CONFIGS = [
@@ -38,6 +38,8 @@ const ESLINT_CONFIGS = [
   "eslint.config.mts",
   "eslint.config.cts"
 ]
+
+const BIOME_CONFIGS = [ "biome.json", "biome.jsonc" ]
 
 const HTML_CONFIGS = [
   ".htmlvalidate.json",
@@ -93,10 +95,37 @@ function houseConfig(...parts) {
   return join(houseRoot, "configs", ...parts)
 }
 
+function packageRoot(name, cwd) {
+  const resolved = resolvePackage(name, cwd)
+  if (resolved) return dirname(resolved)
+
+  let directory = cwd
+  while (true) {
+    const candidate = join(directory, "node_modules", ...name.split("/"))
+    if (existsSync(join(candidate, "package.json"))) return candidate
+
+    const parent = dirname(directory)
+    if (parent === directory) break
+    directory = parent
+  }
+
+  const bundled = join(houseRoot, "node_modules", ...name.split("/"))
+  return existsSync(join(bundled, "package.json")) ? bundled : null
+}
+
+function biomeHouseConfig(cwd) {
+  const root = packageRoot("@razodin137/biome-config", cwd)
+  if (!root) return null
+
+  const config = join(root, "configs", "recommended.json")
+  return existsSync(config) ? config : null
+}
+
 export function projectConfig(lane, cwd) {
   if (lane === "js") return findProjectConfig(cwd, ESLINT_CONFIGS)
   if (lane === "css" || lane === "scss") return findProjectConfig(cwd, STYLELINT_CONFIGS, "stylelint")
   if (lane === "html") return findProjectConfig(cwd, HTML_CONFIGS, "htmlvalidate")
+  if (lane === "md" || lane === "yaml") return findProjectConfig(cwd, BIOME_CONFIGS)
   if (lane === "ruby") return findProjectConfig(cwd, RUBY_CONFIGS)
   if (lane === "python") {
     const found = findProjectConfig(cwd, RUFF_CONFIGS)
@@ -148,6 +177,18 @@ export function resolveLaneConfig(lane, cwd) {
         config: null,
         project: null,
         error: "the html lane needs @razodin137/html-validate-config installed, or an html-validate config in the project"
+      }
+    }
+    return { config, project: null, error: null }
+  }
+
+  if (lane === "md" || lane === "yaml") {
+    const config = biomeHouseConfig(cwd)
+    if (!config) {
+      return {
+        config: null,
+        project: null,
+        error: "the md and yaml lanes need @razodin137/biome-config installed, or a biome config in the project"
       }
     }
     return { config, project: null, error: null }

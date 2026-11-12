@@ -11,23 +11,63 @@ npx house check
 npx house fix
 ```
 
+The packages are not published to npm yet: the command above works once they are, and until then a project installs the runner and each lane's config from a checkout by path. The file types decide the install: a project of `.css` and `.html` files needs only those two lanes, and installing the JS packages would change nothing.
+
+```bash
+npm install --save-dev \
+  /path/to/house-style/house \
+  /path/to/house-style/stylelint-config-css \
+  /path/to/house-style/prettier-config \
+  /path/to/house-style/html-validate-config \
+  stylelint prettier html-validate
+```
+
+`house check` exits `0` when every lane passes, `1` when a rule fails, and `2` when a lane has files but no config or no tool.
+
 Lanes are picked by file type, not by language:
 
-| Lane | Files | Runs |
-| --- | --- | --- |
-| `js` | `.js`, `.mjs`, `.cjs`, `.jsx` | ESLint with `@razodin137/eslint-config`, `--max-warnings 0` |
-| `css` | `.css` | Stylelint with `@razodin137/stylelint-config-css`, then Prettier |
-| `scss` | `.scss` | Stylelint with `@razodin137/stylelint-config-scss`, then Prettier |
-| `html` | `.html`, `.htm` | html-validate with `@razodin137/html-validate-config` |
-| `ruby` | `.rb`, `.rake`, `.gemspec`, `Gemfile`, `Rakefile`, ruby shebangs | RuboCop, via `bundle exec` when a `Gemfile` is present |
-| `shell` | `.sh`, `.bash`, `.zsh`, `.ksh`, shell shebangs | ShellCheck at info severity, then shfmt |
-| `python` | `.py`, `.pyi`, python shebangs | `ruff check`, then `ruff format --check` |
+| Lane     | Files                                                            | Runs                                                              |
+| -------- | ---------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `js`     | `.js`, `.mjs`, `.cjs`, `.jsx`                                    | ESLint with `@razodin137/eslint-config`, `--max-warnings 0`       |
+| `css`    | `.css`                                                           | Stylelint with `@razodin137/stylelint-config-css`, then Prettier  |
+| `scss`   | `.scss`                                                          | Stylelint with `@razodin137/stylelint-config-scss`, then Prettier |
+| `html`   | `.html`, `.htm`                                                  | html-validate with `@razodin137/html-validate-config`             |
+| `md`     | `.md`, `.markdown`                                               | Biome with `@razodin137/biome-config`                             |
+| `yaml`   | `.yaml`, `.yml`                                                  | Biome with `@razodin137/biome-config`                             |
+| `ruby`   | `.rb`, `.rake`, `.gemspec`, `Gemfile`, `Rakefile`, ruby shebangs | RuboCop, via `bundle exec` when a `Gemfile` is present            |
+| `shell`  | `.sh`, `.bash`, `.zsh`, `.ksh`, shell shebangs                   | ShellCheck at info severity, then shfmt                           |
+| `python` | `.py`, `.pyi`, python shebangs                                   | `ruff check`, then `ruff format --check`                          |
 
 A `.css` file never goes through the SCSS config and a `.scss` file never goes through the CSS config: each lane gets its own config. An HTML-only project runs the HTML lane without needing a JS lane.
 
-Project config wins. When a project has no `eslint.config.*`, stylelint config, Prettier config, or html-validate config, the lane uses the matching `@razodin137/*` package installed in the project. Ruby and Python fall back to configs bundled with `house`. A missing tool or missing config fails loudly with exit 2 instead of skipping the lane.
+Project config wins. When a project has no `eslint.config.*`, stylelint config, Prettier config, html-validate config, or Biome config, the lane uses the matching `@razodin137/*` package installed in the project. Ruby and Python fall back to configs bundled with `house`. A missing tool or missing config fails loudly with exit 2 instead of skipping the lane.
 
-`house fix` applies the lane's fixers and then re-runs the checks, so an unfixable violation still fails. See [the package README](/house/README.md) for options and exit codes.
+## Fixing locally
+
+`house fix` is the cleanup command: it applies every lane's fixer and then re-runs the checks, so the tree it reports on is the tree it actually wrote. `house check` stays the read-only gate that CI runs.
+
+```bash
+npx house fix              # clean up every file house can see
+npx house fix src          # only a subtree or a list of files
+npx house check            # report only; this is the CI gate
+```
+
+It exits `0` when the tree is clean, `1` when a violation remains that has no fixer, and `2` when a lane has files but no config or tool. A few rules need a source change rather than a rewrite: Stylelint's `no-duplicate-selectors` (merge the duplicate blocks) and `no-descending-specificity` (move the less specific selector above the more specific one), and html-validate's `element-required-attributes`, `element-required-content`, and `no-implicit-close`. Run `house fix` again after making the change.
+
+### Optional pre-commit hook
+
+To clean staged files automatically, install the hook once per clone:
+
+```bash
+npx house hook install          # writes the hook into .git/hooks
+npx house hook install --force  # replace a hook another tool installed
+```
+
+The hook runs `house fix` on the files staged for the commit, stages whatever the fixers rewrote, and never blocks the commit. It is deliberately permissive: `house check` in CI remains the authoritative gate, so the hook only saves a round trip. It skips the run when the working tree has unstaged changes, because a fixer rewrites the whole file and re-staging it would pull those hunks into the commit. When the repository sets `core.hooksPath`, the hook goes in that directory instead.
+
+Hooks live in the clone, not in the repository, so each contributor opts in. Delete `.git/hooks/pre-commit` to stop; `git commit --no-verify` bypasses it for one commit.
+
+The install-and-fix loop to hand an agent, including the rules `house fix` cannot clear, is written down in [AGENTS.md](/AGENTS.md).
 
 ## Signoff
 
@@ -47,17 +87,20 @@ RuboCop has built-in support for pulling config from a gem. We provide a
 `rubocop-razodin137` gem for this purpose.
 
 To introduce our house style to an app, add `rubocop-razodin137` to your Gemfile:
+
 ```ruby
 gem "rubocop-razodin137", github: "razodin137/house-style", require: false
 ```
 
 And create a boilerplate `.rubocop.yml` that inherits from `rubocop-razodin137`:
+
 ```yaml
 # razodin137 house style
 inherit_gem: { rubocop-razodin137: rubocop.yml }
 ```
 
 ### For non-Rails apps:
+
 ```yaml
 # razodin137 house style
 inherit_gem: { rubocop-razodin137: rubocop-ruby.yml }
@@ -118,6 +161,7 @@ Our config extends [stylelint-config-recommended](https://github.com/stylelint/s
 To see the rules, read the [config itself](/stylelint-config-css/index.js).
 
 To use our small ruleset as a baseline, add the `@razodin137/stylelint-config-css` package:
+
 ```bash
 npm install --save-dev @razodin137/stylelint-config-css
 
@@ -125,6 +169,7 @@ npm install --save-dev @razodin137/stylelint-config-css
 yarn add --dev @razodin137/stylelint-config-css
 ```
 And extend it in your Stylelint config:
+
 ```json
 {
   "extends": "@razodin137/stylelint-config-css",
@@ -136,6 +181,8 @@ And extend it in your Stylelint config:
 ```
 
 The [fixtures](/stylelint-config-css/fixtures) pin the ruleset: `good.css` passes clean, and `bad.css` fails with one violation per rule. Run them from the package directory with `npm test`.
+
+`house fix` runs Stylelint's fixer, so it only clears rules that have one. `no-duplicate-selectors` and `no-descending-specificity` do not: the first needs two blocks merged, and the second needs the less specific selector moved above the more specific one. `house fix` reports them unchanged and `house check` keeps failing until the source changes.
 
 ## Design tokens
 
@@ -177,6 +224,7 @@ Our config extends [stylelint-config-recommended-scss](https://github.com/stylel
 To see the rules, read the [config itself](/stylelint-config-scss/index.js).
 
 To use our small ruleset as a baseline, add the `@razodin137/stylelint-config-scss` package:
+
 ```bash
 npm install --save-dev @razodin137/stylelint-config-scss
 
@@ -184,6 +232,7 @@ npm install --save-dev @razodin137/stylelint-config-scss
 yarn add --dev @razodin137/stylelint-config-scss
 ```
 And extend it in your Stylelint config:
+
 ```json
 {
   "extends": "@razodin137/stylelint-config-scss",
@@ -199,6 +248,8 @@ And extend it in your Stylelint config:
 We use [Biome](https://biomejs.dev) to format Markdown and YAML, and to lint HTML accessibility. You'll need Biome 2.6 or higher — the shared config ships as a [Biome manifest](https://biomejs.dev/guides/publish-packages/#publish-biome-configurations).
 
 Biome formats Markdown and YAML, and lints HTML and JSX for the accessibility rules html-validate cannot express. It does not format HTML: Biome writes void elements as `<br />`, which would fight our html-validate `void-style: omit` rule. JavaScript still stays with ESLint, CSS and SCSS with Prettier, and HTML structure and validity with html-validate. The shared config enables Biome only for those jobs, so `biome check .` never fights the others.
+
+`@razodin137/house` runs the same Biome config for the `md` (`.md`, `.markdown`) and `yaml` (`.yaml`, `.yml`) lanes, so `house check` and `house fix` cover those files in the same pass as every other lane.
 
 To use our ruleset as a baseline, add the `@razodin137/biome-config` package:
 
@@ -276,6 +327,7 @@ Four of those additions are accessibility checks drawn from the vendored [Baseca
 To see the rules, read the [config itself](/html-validate-config/index.js).
 
 To use our ruleset as a baseline, add the `@razodin137/html-validate-config` package:
+
 ```bash
 npm install --save-dev @razodin137/html-validate-config
 
@@ -284,6 +336,7 @@ yarn add --dev @razodin137/html-validate-config
 ```
 
 And extend it in your `.htmlvalidate.json`:
+
 ```json
 {
   "extends": [ "@razodin137/html-validate-config" ],
@@ -358,3 +411,5 @@ The packages are npm workspaces. Run every package's fixtures from the repositor
 ```bash
 npm test --workspaces --if-present
 ```
+
+The repository installs no root lint config of its own, so running the runner against this checkout (`node house/bin/house.js check`) exits `2` rather than linting itself. The packages are the product, and their `bad.*` fixtures are deliberately non-compliant.

@@ -28,6 +28,7 @@
   },
   "homepage": "https://github.com/razodin137/house-style",
   "dependencies": {
+    "@e18e/eslint-plugin": "^0.8.1",
     "@eslint-community/eslint-plugin-eslint-comments": "^4.8.1",
     "@eslint/js": "^10.0.1",
     "@stylistic/eslint-plugin": "^5.10.0",

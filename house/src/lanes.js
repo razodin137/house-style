@@ -1,6 +1,8 @@
 import { extname } from "node:path"
 
 const JS_EXTENSIONS = [ ".js", ".mjs", ".cjs", ".jsx" ]
+const MD_EXTENSIONS = [ ".md", ".markdown" ]
+const YAML_EXTENSIONS = [ ".yaml", ".yml" ]
 const RUBY_EXTENSIONS = [ ".rb", ".rake", ".gemspec" ]
 const SHELL_EXTENSIONS = [ ".sh", ".bash", ".zsh", ".ksh" ]
 const PYTHON_EXTENSIONS = [ ".py", ".pyi" ]
@@ -46,6 +48,20 @@ export const lanes = [
     title: "HTML",
     match(file) {
       return [ ".html", ".htm" ].includes(extname(file).toLowerCase())
+    }
+  },
+  {
+    id: "md",
+    title: "Markdown",
+    match(file) {
+      return hasExtension(file, MD_EXTENSIONS)
+    }
+  },
+  {
+    id: "yaml",
+    title: "YAML",
+    match(file) {
+      return hasExtension(file, YAML_EXTENSIONS)
     }
   },
   {

@@ -1,0 +1,19 @@
+# Shared editor defaults for this repository.
+# The language tools stay the source of truth for formatting: ESLint/Stylelint/
+# Prettier for JS and CSS, Biome for Markdown and YAML, RuboCop for Ruby,
+# Ruff for Python, and shfmt for shell. These settings only keep editors in
+# step with them.
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# Trailing spaces are meaningful in Markdown: two of them make a hard break.
+[*.{md,markdown}]
+trim_trailing_whitespace = false

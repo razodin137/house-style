@@ -36,6 +36,7 @@
     "test": "node --test test/*.test.mjs"
   },
   "peerDependencies": {
+    "@razodin137/biome-config": ">=0.1.0",
     "@razodin137/eslint-config": ">=0.1.0",
     "@razodin137/html-validate-config": ">=0.1.0",
     "@razodin137/prettier-config": ">=0.1.0",
@@ -43,6 +44,9 @@
     "@razodin137/stylelint-config-scss": ">=0.1.0"
   },
   "peerDependenciesMeta": {
+    "@razodin137/biome-config": {
+      "optional": true
+    },
     "@razodin137/eslint-config": {
       "optional": true
     },

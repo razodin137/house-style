@@ -427,6 +427,11 @@ globalThis.nestedTernary = nestedTernary
 
 new Date()
 
+function lowercaseConstructor() {}
+
+const lowercaseInstance = new lowercaseConstructor()
+globalThis.lowercaseInstance = lowercaseInstance
+
 const dynamicFunction = new Function("return 1")
 
 globalThis.dynamicFunction = dynamicFunction
@@ -605,6 +610,14 @@ const spread = Math.max.apply(Math, spreadArguments)
 
 globalThis.spread = spread
 
+function uselessCallTarget(value) {
+  return value
+}
+
+const uselessCall = uselessCallTarget.call(null, 1)
+
+globalThis.uselessCall = uselessCall
+
 const template = "a" + globalThis.name
 
 globalThis.template = template
@@ -777,6 +790,13 @@ const keySpacing = { key:1 }
 
 globalThis.keySpacing = keySpacing
 
+const objectPropertyNewline = {
+  first: 1, second: 2,
+  third: 3
+}
+
+globalThis.objectPropertyNewline = objectPropertyNewline
+
 if(globalThis) {}
 
 class ClassMembers {
@@ -882,6 +902,10 @@ spaceInParens( 1 )
 function spaceInParens(value) {
   return value
 }
+
+const callSpacing = spaceInParens (1)
+
+globalThis.callSpacing = callSpacing
 
 const infixOps = 1+2
 

@@ -1,0 +1,72 @@
+function isMemberCall(node, name) {
+    return (node.callee.type === 'MemberExpression' &&
+        !node.callee.computed &&
+        node.callee.property.type === 'Identifier' &&
+        node.callee.property.name === name);
+}
+export const preferFlatMapOverMapFlat = {
+    meta: {
+        type: 'suggestion',
+        docs: {
+            description: 'Prefer Array.prototype.flatMap() over .map(fn).flat() to avoid the intermediate array',
+            recommended: false
+        },
+        fixable: 'code',
+        schema: [],
+        messages: {
+            preferFlatMap: 'Use `.flatMap(fn)` instead of `.map(fn).flat()` — skips the intermediate array.'
+        }
+    },
+    create(context) {
+        const { sourceCode } = context;
+        return {
+            CallExpression(node) {
+                // outer .flat()
+                if (!isMemberCall(node, 'flat'))
+                    return;
+                // .flat() must take no argument or `1` (the default depth)
+                if (node.arguments.length > 1)
+                    return;
+                if (node.arguments.length === 1) {
+                    const depth = node.arguments[0];
+                    if (depth.type !== 'Literal' ||
+                        typeof depth.value !== 'number' ||
+                        depth.value !== 1)
+                        return;
+                }
+                const inner = node.callee.object;
+                if (inner.type !== 'CallExpression')
+                    return;
+                if (!isMemberCall(inner, 'map'))
+                    return;
+                // .map must have exactly one argument (the mapper)
+                if (inner.arguments.length !== 1)
+                    return;
+                const mapperArg = inner.arguments[0];
+                if (mapperArg.type === 'SpreadElement')
+                    return;
+                context.report({
+                    node,
+                    messageId: 'preferFlatMap',
+                    fix(fixer) {
+                        const mapProperty = inner.callee.property;
+                        const dotToken = sourceCode.getTokenBefore(node.callee.property);
+                        if (!dotToken)
+                            return null;
+                        const previousToken = sourceCode.getTokenBefore(dotToken);
+                        const gap = previousToken
+                            ? sourceCode.text.slice(previousToken.range[1], dotToken.range[0])
+                            : '';
+                        const removeStart = previousToken && gap.includes('\n') && gap.trim() === ''
+                            ? previousToken.range[1]
+                            : dotToken.range[0];
+                        return [
+                            fixer.replaceText(mapProperty, 'flatMap'),
+                            fixer.removeRange([removeStart, node.range[1]])
+                        ];
+                    }
+                });
+            }
+        };
+    }
+};

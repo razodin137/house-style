@@ -9,21 +9,46 @@ npx house check
 npx house fix
 ```
 
-`house check` reports without writing. `house fix` applies each lane's fixers and then re-runs the checks, so an unfixable violation still fails.
+`house check` reports without writing. `house fix` is the cleanup command: it applies each lane's fixers and then re-runs the checks, so an unfixable violation still fails.
+
+## Fixing locally
+
+Run `house fix` before handing work over or opening a pull request:
+
+```bash
+house fix              # every file the runner can see
+house fix src lib      # only these paths
+house check            # the read-only gate CI should run
+```
+
+Fixers cover `eslint --fix`, `stylelint --fix`, `prettier --write`, `html-validate --fix`, `biome format --write`, `rubocop -a`, `shfmt -w`, and `ruff check --fix` plus `ruff format`. Exit `0` means the tree is clean, `1` means something remains that needs a source change, and `2` means a lane has files but no config or tool.
+
+### Optional pre-commit hook
+
+`house hook install` puts a pre-commit hook in the current clone:
+
+```bash
+house hook install
+house hook install --force   # replace a hook another tool installed
+```
+
+The hook fixes only the files staged for the commit and stages the result. It never blocks the commit, and it skips the run when unstaged changes are present, so partially staged files cannot leak into the commit. That makes it a convenience, not a gate: keep `house check` in CI as the authoritative check. Hooks are per clone, so each contributor opts in; remove the hook file to uninstall, or bypass it with `git commit --no-verify`. Running `house hook install` again is safe and leaves the hook in place. It writes to `.git/hooks/pre-commit`, or to the directory named by `core.hooksPath` when the repository sets one.
 
 ## Lanes
 
 Lanes are chosen by file type, not by language. That matters at the edges: a `.css` file is always checked with the CSS Stylelint config and never with the SCSS one, and an HTML project with no JavaScript still gets its HTML checked.
 
-| Lane | Files | Check steps | Fix steps |
-| --- | --- | --- | --- |
-| `js` | `.js`, `.mjs`, `.cjs`, `.jsx` | `eslint --max-warnings 0` | `eslint --fix`, then check |
-| `css` | `.css` | `prettier --check`, `stylelint` | `stylelint --fix`, `prettier --write`, then check |
-| `scss` | `.scss` | `prettier --check`, `stylelint` | `stylelint --fix`, `prettier --write`, then check |
-| `html` | `.html`, `.htm` | `html-validate` | `html-validate --fix`, then check |
-| `ruby` | `.rb`, `.rake`, `.gemspec`, `Gemfile`, `Rakefile`, ruby shebangs | `rubocop` | `rubocop -a`, then check |
-| `shell` | `.sh`, `.bash`, `.zsh`, `.ksh`, shell shebangs | `shellcheck --severity=info`, `shfmt -i 2 -d` | `shfmt -i 2 -w`, then check |
-| `python` | `.py`, `.pyi`, python shebangs | `ruff check`, `ruff format --check` | `ruff check --fix`, `ruff format`, then check |
+| Lane     | Files                                                            | Check steps                                   | Fix steps                                         |
+| -------- | ---------------------------------------------------------------- | --------------------------------------------- | ------------------------------------------------- |
+| `js`     | `.js`, `.mjs`, `.cjs`, `.jsx`                                    | `eslint --max-warnings 0`                     | `eslint --fix`, then check                        |
+| `css`    | `.css`                                                           | `prettier --check`, `stylelint`               | `stylelint --fix`, `prettier --write`, then check |
+| `scss`   | `.scss`                                                          | `prettier --check`, `stylelint`               | `stylelint --fix`, `prettier --write`, then check |
+| `html`   | `.html`, `.htm`                                                  | `html-validate`                               | `html-validate --fix`, then check                 |
+| `md`     | `.md`, `.markdown`                                               | `biome format`                                | `biome format --write`, then check                |
+| `yaml`   | `.yaml`, `.yml`                                                  | `biome format`                                | `biome format --write`, then check                |
+| `ruby`   | `.rb`, `.rake`, `.gemspec`, `Gemfile`, `Rakefile`, ruby shebangs | `rubocop`                                     | `rubocop -a`, then check                          |
+| `shell`  | `.sh`, `.bash`, `.zsh`, `.ksh`, shell shebangs                   | `shellcheck --severity=info`, `shfmt -i 2 -d` | `shfmt -i 2 -w`, then check                       |
+| `python` | `.py`, `.pyi`, python shebangs                                   | `ruff check`, `ruff format --check`           | `ruff check --fix`, `ruff format`, then check     |
 
 Ruby uses `bundle exec rubocop` when the project has a `Gemfile`.
 
@@ -31,8 +56,8 @@ Ruby uses `bundle exec rubocop` when the project has a `Gemfile`.
 
 For each lane, `house` uses this order:
 
-1. The project's own config (`eslint.config.*`, a stylelint config, a Prettier config, an html-validate config, `.rubocop.yml`, `ruff.toml` or `[tool.ruff]` in `pyproject.toml`).
-2. The matching `@razodin137/*` package installed in the project (`@razodin137/eslint-config`, `@razodin137/stylelint-config-css`, `@razodin137/stylelint-config-scss`, `@razodin137/prettier-config`, `@razodin137/html-validate-config`).
+1. The project's own config (`eslint.config.*`, a stylelint config, a Prettier config, an html-validate config, `biome.json` or `biome.jsonc`, `.rubocop.yml`, `ruff.toml` or `[tool.ruff]` in `pyproject.toml`).
+2. The matching `@razodin137/*` package installed in the project (`@razodin137/eslint-config`, `@razodin137/stylelint-config-css`, `@razodin137/stylelint-config-scss`, `@razodin137/prettier-config`, `@razodin137/html-validate-config`, `@razodin137/biome-config`).
 3. For Ruby and Python only, the config bundled with `house` (`configs/rubocop-ruby.yml` and `configs/ruff.toml`).
 
 The bundled Ruby and Python configs are copies of the gem and vendored configs; the test suite pins them so they cannot drift.
@@ -56,6 +81,7 @@ house check --lane css,scss
 house check [options] [paths...]
 house fix [options] [paths...]
 house signoff [options] [paths...]
+house hook install [--force]
 
 -l, --lane <id>    only run these lanes (repeat or comma-separate)
     --list         show detected lanes and files, then exit
@@ -65,6 +91,8 @@ house signoff [options] [paths...]
 -h, --help         show help
 -V, --version      show the version
 ```
+
+`house hook install` accepts `--force` to replace an existing hook and `--json` for a machine-readable result.
 
 Signoff options:
 

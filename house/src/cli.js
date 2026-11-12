@@ -3,6 +3,7 @@ import { join } from "node:path"
 import { parseArgs } from "node:util"
 import { buildPlan } from "./commands.js"
 import { groupByLane, discoverFiles } from "./files.js"
+import { installHook } from "./hooks.js"
 import { lanes, laneIds } from "./lanes.js"
 import { houseRoot } from "./paths.js"
 import { resolveLaneConfig, resolvePrettierConfig } from "./config.js"
@@ -11,6 +12,7 @@ import { runStep } from "./run.js"
 const VERSION = JSON.parse(readFileSync(join(houseRoot, "package.json"), "utf8")).version
 
 const TOOL_HINTS = {
+  biome: "npm install --save-dev @biomejs/biome",
   bundle: "install bundler, or add a Gemfile-based setup",
   eslint: "npm install --save-dev eslint",
   gh: "install the GitHub CLI, then gh extension install basecamp/gh-signoff",
@@ -71,12 +73,15 @@ function usage() {
     "  house check [options] [paths...]",
     "  house fix [options] [paths...]",
     "  house signoff [options] [paths...]",
+    "  house hook install [--force]",
     "",
     "Lanes are chosen by file type, not language:",
     "  js      .js .mjs .cjs .jsx",
     "  css     .css",
     "  scss    .scss",
     "  html    .html .htm",
+    "  md      .md .markdown",
+    "  yaml    .yaml .yml",
     "  ruby    .rb .rake .gemspec, Gemfile, Rakefile, ruby shebangs",
     "  shell   .sh .bash .zsh .ksh, shell shebangs",
     "  python  .py .pyi, python shebangs",
@@ -332,6 +337,59 @@ function reportLanes(command, laneResults, checked, color, verbose) {
   return lines
 }
 
+function hookUsage() {
+  return [
+    "house hook — optional pre-commit integration",
+    "",
+    "Usage:",
+    "  house hook install [--force]",
+    "",
+    "The hook fixes only the files staged for the commit, stages whatever",
+    "it rewrote, and never blocks the commit. house check remains the gate."
+  ].join("\n")
+}
+
+function runHook(positionals, values, cwd) {
+  const rejected = values.lane || values.list || values.context || values.commit || values.url || values.fail
+
+  if (rejected) {
+    process.stderr.write("house hook: only --force, --json, --verbose, and --color are valid\n")
+    return 2
+  }
+
+  if (positionals.length !== 1 || positionals[0] !== "install") {
+    process.stderr.write(`house: expected "house hook install"\n\n${hookUsage()}\n`)
+    return 2
+  }
+
+  const result = installHook(cwd, { force: Boolean(values.force) })
+
+  if (result.status === "no-git") {
+    process.stderr.write("house hook: not inside a git repository (or git is not installed), so there is nowhere to install the hook\n")
+    return 2
+  }
+
+  if (result.status === "exists") {
+    process.stderr.write(`house hook: ${result.path} already exists; pass --force to replace it\n`)
+    return 2
+  }
+
+  if (values.json) {
+    process.stdout.write(`${JSON.stringify({
+      command: "hook",
+      action: "install",
+      status: "installed",
+      path: result.path,
+      exitCode: 0
+    }, null, 2)}\n`)
+    return 0
+  }
+
+  process.stdout.write(`house hook: installed ${result.path}\n`)
+  process.stdout.write("house hook: optional; it never blocks a commit, and house check remains the gate\n")
+  return 0
+}
+
 function signoffLabel(reportFailure, contexts) {
   if (reportFailure) return "fail"
   if (contexts.length > 0) return contexts.join(", ")
@@ -441,6 +499,9 @@ export async function main(argv) {
     process.stderr.write("house: --color must be auto, always, or never\n")
     return 2
   }
+
+  if (command === "hook") return runHook(positionals.slice(1), values, cwd)
+
   const runnable = command === "check" || command === "fix" || command === "signoff"
   const paths = runnable ? positionals.slice(1) : positionals
   const files = discoverFiles(cwd, paths)

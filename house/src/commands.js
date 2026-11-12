@@ -57,6 +57,22 @@ function htmlPlan(files, config, fix) {
   }
 }
 
+function biomePlan(files, config, fix) {
+  const base = config ? [ `--config-path=${config}` ] : []
+
+  if (fix) {
+    return {
+      fix: [ step("biome", [ "format", ...base, "--write", ...files ]) ],
+      check: [ step("biome", [ "format", ...base, ...files ]) ]
+    }
+  }
+
+  return {
+    fix: [],
+    check: [ step("biome", [ "format", ...base, ...files ]) ]
+  }
+}
+
 function rubyPlan(files, config, cwd, fix) {
   const bundler = existsSync(join(cwd, "Gemfile"))
   const command = bundler ? "bundle" : "rubocop"
@@ -114,6 +130,7 @@ export function buildPlan(lane, files, { config, prettier, cwd, fix }) {
   if (lane === "js") return eslintPlan(files, config, fix)
   if (lane === "css" || lane === "scss") return stylePlan(files, config, prettier, fix)
   if (lane === "html") return htmlPlan(files, config, fix)
+  if (lane === "md" || lane === "yaml") return biomePlan(files, config, fix)
   if (lane === "ruby") return rubyPlan(files, config, cwd, fix)
   if (lane === "shell") return shellPlan(files, fix)
   if (lane === "python") return pythonPlan(files, config, fix)

@@ -1,0 +1,73 @@
+function stringValue(node) {
+    if (node.type === 'Literal') {
+        return typeof node.value === 'string' ? node.value : null;
+    }
+    if (node.type === 'TemplateLiteral' && node.expressions.length === 0) {
+        const cooked = node.quasis[0]?.value.cooked;
+        return typeof cooked === 'string' ? cooked : null;
+    }
+    return null;
+}
+function isSupportedLimit(limit, index) {
+    if (!limit)
+        return true;
+    if (limit.type !== 'Literal')
+        return false;
+    const { value } = limit;
+    return typeof value === 'number' && Number.isInteger(value) && value > index;
+}
+function getSplitCall(node) {
+    const call = node.object;
+    if (call.type !== 'CallExpression')
+        return null;
+    const callee = call.callee;
+    if (callee.type !== 'MemberExpression' || callee.computed)
+        return null;
+    if (callee.property.type !== 'Identifier' || callee.property.name !== 'split')
+        return null;
+    if (call.arguments.length === 0 || call.arguments.length > 2)
+        return null;
+    const separator = call.arguments[0];
+    if (!separator)
+        return null;
+    const value = stringValue(separator);
+    if (value === null || value.length === 0)
+        return null;
+    return call;
+}
+export const preferSliceOverSplitIndex = {
+    meta: {
+        type: 'suggestion',
+        docs: {
+            description: 'Prefer `indexOf(needle)` and `slice(...)` over `split()[N]` when splitting a string into two pieces.',
+            recommended: false
+        },
+        schema: [],
+        messages: {
+            preferSliceFirst: 'Prefer `indexOf(needle)` and `slice(0, index)` over `split(needle)[0]` for string separators. `split` will allocate an intermediate array, resulting in poorer performance. Preserve the missing-separator fallback explicitly.',
+            preferSliceSecond: 'Prefer `indexOf(needle)` and `slice(index)` over `split(needle)[1]` for string separators. `split` will allocate an intermediate array, resulting in poorer performance. Preserve the missing-separator fallback explicitly.'
+        }
+    },
+    create(context) {
+        return {
+            MemberExpression(node) {
+                if (!node.computed)
+                    return;
+                if (node.property.type !== 'Literal')
+                    return;
+                const index = node.property.value;
+                if (index !== 0 && index !== 1)
+                    return;
+                const call = getSplitCall(node);
+                if (!call)
+                    return;
+                if (!isSupportedLimit(call.arguments[1], index))
+                    return;
+                context.report({
+                    node,
+                    messageId: index === 0 ? 'preferSliceFirst' : 'preferSliceSecond'
+                });
+            }
+        };
+    }
+};

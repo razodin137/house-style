@@ -1,0 +1,80 @@
+import { recommended } from './configs/recommended.js';
+import { modernization } from './configs/modernization.js';
+import { moduleReplacements } from './configs/module-replacements.js';
+import { performanceImprovements } from './configs/performance-improvements.js';
+import { preferArrayAt } from './rules/prefer-array-at.js';
+import { preferArrayFill } from './rules/prefer-array-fill.js';
+import { preferArrayFromMap } from './rules/prefer-array-from-map.js';
+import { preferIncludes } from './rules/prefer-includes.js';
+import { preferArrayToReversed } from './rules/prefer-array-to-reversed.js';
+import { preferArrayToSorted } from './rules/prefer-array-to-sorted.js';
+import { preferArrayToSpliced } from './rules/prefer-array-to-spliced.js';
+import { preferExponentiationOperator } from './rules/prefer-exponentiation-operator.js';
+import { preferNullishCoalescing } from './rules/prefer-nullish-coalescing.js';
+import { preferObjectHasOwn } from './rules/prefer-object-has-own.js';
+import { preferSpreadSyntax } from './rules/prefer-spread-syntax.js';
+import { preferUrlCanParse } from './rules/prefer-url-canparse.js';
+import { noIndexOfEquality } from './rules/no-indexof-equality.js';
+import { preferTimerArgs } from './rules/prefer-timer-args.js';
+import { preferDateNow } from './rules/prefer-date-now.js';
+import { preferRegexTest } from './rules/prefer-regex-test.js';
+import { preferArraySome } from './rules/prefer-array-some.js';
+import { preferStaticRegex } from './rules/prefer-static-regex.js';
+import { preferInlineEquality } from './rules/prefer-inline-equality.js';
+import { banDependencies } from './rules/ban-dependencies.js';
+import { preferIncludesOverRegexTest } from './rules/prefer-includes-over-regex-test.js';
+import { noDeleteProperty } from './rules/no-delete-property.js';
+import { preferStringFromCharCode } from './rules/prefer-string-fromcharcode.js';
+import { noSpreadInReduce } from './rules/no-spread-in-reduce.js';
+import { preferFlatMapOverMapFlat } from './rules/prefer-flatmap-over-map-flat.js';
+import { preferStaticCollator } from './rules/prefer-static-collator.js';
+import { preferGetOrInsert } from './rules/prefer-get-or-insert.js';
+import { preferCharCodeAtInLoop } from './rules/prefer-charcode-at-in-loop.js';
+import { preferSliceOverSplitIndex } from './rules/prefer-slice-over-split-index.js';
+import { preferThrowIfNoEntry } from './rules/prefer-throw-if-no-entry.js';
+const plugin = {
+    meta: {
+        name: 'e18e',
+        namespace: 'e18e'
+    },
+    rules: {
+        'prefer-array-at': preferArrayAt,
+        'prefer-array-fill': preferArrayFill,
+        'prefer-array-from-map': preferArrayFromMap,
+        'prefer-includes': preferIncludes,
+        'prefer-array-to-reversed': preferArrayToReversed,
+        'prefer-array-to-sorted': preferArrayToSorted,
+        'prefer-array-to-spliced': preferArrayToSpliced,
+        'prefer-exponentiation-operator': preferExponentiationOperator,
+        'prefer-nullish-coalescing': preferNullishCoalescing,
+        'prefer-object-has-own': preferObjectHasOwn,
+        'prefer-spread-syntax': preferSpreadSyntax,
+        'prefer-url-canparse': preferUrlCanParse,
+        'no-indexof-equality': noIndexOfEquality,
+        'prefer-timer-args': preferTimerArgs,
+        'prefer-date-now': preferDateNow,
+        'prefer-regex-test': preferRegexTest,
+        'prefer-array-some': preferArraySome,
+        'prefer-static-regex': preferStaticRegex,
+        'prefer-inline-equality': preferInlineEquality,
+        'prefer-string-fromcharcode': preferStringFromCharCode,
+        'prefer-includes-over-regex-test': preferIncludesOverRegexTest,
+        'no-delete-property': noDeleteProperty,
+        'no-spread-in-reduce': noSpreadInReduce,
+        'prefer-flatmap-over-map-flat': preferFlatMapOverMapFlat,
+        'prefer-static-collator': preferStaticCollator,
+        'prefer-get-or-insert': preferGetOrInsert,
+        'prefer-charcode-at-in-loop': preferCharCodeAtInLoop,
+        'prefer-slice-over-split-index': preferSliceOverSplitIndex,
+        'prefer-throw-if-no-entry': preferThrowIfNoEntry,
+        'ban-dependencies': banDependencies
+    }
+};
+const configs = {
+    recommended: recommended(plugin),
+    modernization: modernization(plugin),
+    moduleReplacements: moduleReplacements(plugin),
+    performanceImprovements: performanceImprovements(plugin)
+};
+plugin.configs = configs;
+export default plugin;
