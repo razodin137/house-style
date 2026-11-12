@@ -94,6 +94,21 @@
   width: calc(1px +2px);
 }
 
+/* function-linear-gradient-no-nonstandard-direction */
+.linear-gradient-direction {
+  --gradient: linear-gradient(top, red, blue);
+}
+
+/* function-no-unknown */
+.unknown-function {
+  --function: not-a-function(1);
+}
+
+/* unit-no-unknown */
+.unknown-unit {
+  --unit: 10pixels;
+}
+
 /* keyframe-block-no-duplicate-selectors */
 @keyframes dupkf {
   0% { opacity: 0 }

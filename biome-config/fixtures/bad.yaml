@@ -1,0 +1,9 @@
+# House style
+name: house-style
+description: 'Formatting for Markdown and YAML'
+files:
+    - '**/*.md'
+    - '**/*.yaml'
+nested:
+    enabled: true
+    list: [one, two]

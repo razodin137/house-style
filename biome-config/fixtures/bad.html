@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Test</title>
+    <!-- noAriaUnsupportedElements -->
+    <meta charset="utf-8" aria-hidden="true">
+  </head>
+  <body>
+    <!-- noAccessKey -->
+    <div accesskey="x">Access key</div>
+
+    <!-- noAmbiguousAnchorText -->
+    <a href="/x">click here</a>
+
+    <!-- noAutofocus -->
+    <input autofocus>
+
+    <!-- noHeaderScope -->
+    <div scope="col">Header scope</div>
+
+    <!-- noInteractiveElementToNoninteractiveRole -->
+    <button type="button" role="heading" aria-level="2">Heading button</button>
+
+    <!-- noLabelWithoutControl -->
+    <label>Name</label>
+
+    <!-- noNoninteractiveElementToInteractiveRole and useFocusableInteractive -->
+    <h1 role="button">Role button heading</h1>
+
+    <!-- noNoninteractiveTabindex -->
+    <div tabindex="0">Noninteractive tabindex</div>
+
+    <!-- noPositiveTabindex -->
+    <button type="button" tabindex="1">Positive tabindex</button>
+
+    <!-- noRedundantAlt -->
+    <img src="/x.png" alt="photo of a cat">
+
+    <!-- noStaticElementInteractions -->
+    <div onclick="go()" onkeydown="go()">Static interaction</div>
+
+    <!-- noSvgWithoutTitle -->
+    <svg></svg>
+
+    <!-- useAriaActivedescendantWithTabindex and useAriaPropsSupportedByRole -->
+    <div aria-activedescendant="x">Active descendant</div>
+
+    <!-- useAriaPropsForRole -->
+    <div role="checkbox" tabindex="0">Missing aria-checked</div>
+
+    <!-- useButtonType -->
+    <button>No type</button>
+
+    <!-- useIframeTitle -->
+    <iframe src="/x"></iframe>
+
+    <!-- useKeyWithClickEvents -->
+    <div role="button" tabindex="0" onclick="go()">Click without key</div>
+
+    <!-- useKeyWithMouseEvents -->
+    <button type="button" onmouseover="go()" onmouseout="go()">Mouse without focus</button>
+
+    <!-- useMediaCaption -->
+    <video src="/x.mp4"></video>
+
+    <!-- useValidAnchor -->
+    <a>No destination</a>
+
+    <!-- useValidAriaProps -->
+    <div aria-madeup="x">Bad ARIA prop</div>
+
+    <!-- useValidAriaRole -->
+    <div role="madeup">Bad ARIA role</div>
+
+    <!-- useValidAriaValues -->
+    <div role="checkbox" aria-checked="maybe" tabindex="0">Bad ARIA value</div>
+  </body>
+</html>
+
+<!-- useHtmlLang and useValidLang cannot both fire on the same html element. -->
+<!-- useHtmlLang: the document above has no lang attribute. -->
+<html lang="zz">
+  <head><title>Bad language</title></head>
+  <body></body>
+</html>

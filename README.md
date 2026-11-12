@@ -66,7 +66,7 @@ export default [
 
 We use [Stylelint](https://stylelint.io) for our CSS. You'll need Stylelint 17 or higher to use our shared config.
 
-Our config extends [stylelint-config-recommended](https://github.com/stylelint/stylelint-config-recommended) and makes it a little more lax.
+Our config extends [stylelint-config-recommended](https://github.com/stylelint/stylelint-config-recommended), turns off its empty-comment rule, and adds three correctness rules it leaves out: nonstandard gradient directions, unknown functions, and unknown units.
 
 To see the rules, read the [config itself](/stylelint-config-css/index.js).
 
@@ -115,6 +115,46 @@ And extend it in your Stylelint config:
   }
 }
 ```
+
+## Markdown, YAML, and HTML
+
+We use [Biome](https://biomejs.dev) to format Markdown and YAML, and to lint HTML accessibility. You'll need Biome 2.6 or higher — the shared config ships as a [Biome manifest](https://biomejs.dev/guides/publish-packages/#publish-biome-configurations).
+
+Biome formats Markdown and YAML, and lints HTML and JSX for the accessibility rules html-validate cannot express. It does not format HTML: Biome writes void elements as `<br />`, which would fight our html-validate `void-style: omit` rule. JavaScript still stays with ESLint, CSS and SCSS with Prettier, and HTML structure and validity with html-validate. The shared config enables Biome only for those jobs, so `biome check .` never fights the others.
+
+To use our ruleset as a baseline, add the `@razodin137/biome-config` package:
+
+```bash
+npm install --save-dev @razodin137/biome-config @biomejs/biome
+```
+
+Or with Yarn:
+
+```bash
+yarn add --dev @razodin137/biome-config @biomejs/biome
+```
+
+And extend it in your `biome.json`:
+
+```json
+{
+  "extends": [ "@razodin137/biome-config/configs/recommended" ]
+}
+```
+
+Gate formatting and accessibility linting from your package scripts:
+
+```json
+{
+  "scripts": {
+    "format:check": "biome format .",
+    "format": "biome format --write .",
+    "lint:a11y": "biome lint ."
+  }
+}
+```
+
+The [fixtures](/biome-config/fixtures) pin the ruleset: `good.{md,yaml}` pass clean, `bad.{md,yaml}` reformat to exactly their pinned good output, `good.html` passes lint, and `bad.html` fails with all 28 expected accessibility rules, one violation each. The deliberately off-style `ignored.js` is left alone. Run them from the package directory with `npm test`.
 
 ## Formatting
 

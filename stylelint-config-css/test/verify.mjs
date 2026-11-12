@@ -19,6 +19,8 @@ const expected = [
   "font-family-no-duplicate-names",
   "font-family-no-missing-generic-family-keyword",
   "function-calc-no-unspaced-operator",
+  "function-linear-gradient-no-nonstandard-direction",
+  "function-no-unknown",
   "keyframe-block-no-duplicate-selectors",
   "keyframe-declaration-no-important",
   "media-feature-name-no-unknown",
@@ -41,7 +43,8 @@ const expected = [
   "selector-pseudo-element-no-unknown",
   "selector-type-no-unknown",
   "string-no-newline",
-  "syntax-string-no-invalid"
+  "syntax-string-no-invalid",
+  "unit-no-unknown"
 ]
 
 const configFile = fileURLToPath(new URL("../index.js", import.meta.url))

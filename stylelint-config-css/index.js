@@ -6,6 +6,9 @@ module.exports = {
   reportNeedlessDisables: true,
 
   rules: {
-    "comment-no-empty": null
+    "comment-no-empty": null,
+    "function-linear-gradient-no-nonstandard-direction": true,
+    "function-no-unknown": true,
+    "unit-no-unknown": true
   }
 }
