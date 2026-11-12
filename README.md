@@ -143,3 +143,13 @@ And extend it in your `.htmlvalidate.json`:
 
 The [fixtures](/html-validate-config/fixtures) pin the ruleset: `good.html` passes clean, and `bad.html` fails with one violation per rule. Run them from the package directory with `npm test`.
 
+## Shell
+
+We use [ShellCheck](https://www.shellcheck.net) for linting and [shfmt](https://github.com/mvdan/sh) for formatting our shell scripts. They're plain binaries — no Node required — so install them with your usual tool manager (`mise use shellcheck shfmt`, or brew). You'll need ShellCheck 0.11 or higher and shfmt 3 or newer; the fixtures run against the versions pinned in [mise.toml](/shell/mise.toml).
+
+ShellCheck catches what breaks gate scripts: quoting and word splitting, unassigned variables, missing shebangs. Modern ShellCheck grades severity by context, so we gate at info severity — that's where the unquoted-expansion checks live — and style checks stay advisory (see [`lint.sh`](/shell/lint.sh)). shfmt pins standard formatting with the house 2-space indent, and `lint.sh --fix` lets it rewrite files first.
+
+There's no config registry for shell tools, so adoption is vendoring: copy [`lint.sh`](/shell/lint.sh) and [`.shellcheckrc`](/shell/.shellcheckrc) into your project root — the rc is where project-level disables go, and editor plugins honor it too — then gate with `./lint.sh`. Merge the [`.editorconfig`](/shell/.editorconfig) section into your project's so editors match.
+
+The [fixtures](/shell/fixtures) pin the ruleset: `good.sh` passes clean, and `bad.sh` fails with the pinned violations while its planted style check stays silent. Run them from the directory with `./test/verify.sh`.
+

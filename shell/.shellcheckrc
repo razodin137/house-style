@@ -1,0 +1,5 @@
+# 37signals house style for shell — project overrides go here.
+# The gate itself (lint.sh) runs ShellCheck at info severity, which
+# includes the unquoted-expansion checks; style checks stay advisory.
+# Silence a check for this project with a disable, used sparingly:
+# disable=SC1091   # scripts that source project files, linted without -x
