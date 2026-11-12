@@ -153,3 +153,13 @@ There's no config registry for shell tools, so adoption is vendoring: copy [`lin
 
 The [fixtures](/shell/fixtures) pin the ruleset: `good.sh` passes clean, and `bad.sh` fails with the pinned violations while its planted style check stays silent. Run them from the directory with `./test/verify.sh`.
 
+## Python
+
+We use [Ruff](https://docs.astral.sh/ruff/) for our Python. It's a single binary — no Node, no gem — so install it with your usual tool manager (`mise use ruff`, or brew). You'll need ruff 0.17 or newer; the fixtures run against the version pinned in [mise.toml](/python/mise.toml).
+
+Ruff does both jobs: `ruff format` pins the house DNA — double quotes, 2-space indent, instead of Black's 4 — and `ruff check` gates on ruff's own default rule set, kept deliberately: pyflakes plus a curated slice of correctness rules (bugbear, isort, pyupgrade). What the formatter owns stays out of the linter, so nothing fights the fixer, and unused arguments stay allowed, same as the JavaScript `no-unused-vars` with `args: none`. The one relaxation is PLW1510 — gate scripts read returncodes on purpose (see [`ruff.toml`](/python/ruff.toml)).
+
+There's no config registry for ruff either, so adoption is vendoring: copy [`ruff.toml`](/python/ruff.toml) into your project root — it's where project overrides go, and editor plugins honor it too — and [`lint.sh`](/python/lint.sh) if you want the gate wired up, then gate with `./lint.sh` (`--fix` lets ruff rewrite first). Merge the [`.editorconfig`](/python/.editorconfig) section into your project's so editors match.
+
+The [fixtures](/python/fixtures) pin the ruleset: `good.py` passes clean, and `bad.py` fails with the pinned diagnostics while its planted unused argument stays silent. Run them from the directory with `./test/verify.sh`.
+

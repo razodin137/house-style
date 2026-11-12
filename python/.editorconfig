@@ -1,0 +1,4 @@
+# 37signals house style for Python — merge into your project's .editorconfig.
+[*.py]
+indent_style = space
+indent_size = 2
