@@ -16,8 +16,11 @@
 }
 
 /* at-rule-no-deprecated */
-@document url-prefix("https://") {
-  .in-document { color: red }
+@document url-prefix("https://")
+{
+  .in-document {
+    color: red;
+  }
 }
 
 /* at-rule-descriptor-no-unknown */
@@ -32,7 +35,9 @@
 
 /* at-rule-prelude-no-invalid */
 @keyframes 1abc {
-  from { opacity: 0 }
+  from {
+    opacity: 0;
+  }
 }
 
 /* syntax-string-no-invalid */
@@ -59,7 +64,6 @@
 
 /* declaration-block-no-duplicate-properties */
 .dup-props {
-  color: red;
   color: blue;
 }
 
@@ -71,7 +75,7 @@
 
 /* declaration-property-value-keyword-no-deprecated */
 .deprecated-value {
-  color: window;
+  color: canvas;
 }
 
 /* declaration-property-value-no-unknown */
@@ -91,7 +95,7 @@
 
 /* function-calc-no-unspaced-operator */
 .calc-unspaced {
-  width: calc(1px +2px);
+  width: calc(1px + 2px);
 }
 
 /* function-linear-gradient-no-nonstandard-direction */
@@ -111,33 +115,47 @@
 
 /* keyframe-block-no-duplicate-selectors */
 @keyframes dupkf {
-  0% { opacity: 0 }
-  0% { opacity: 1 }
+  0% {
+    opacity: 0;
+  }
+  0% {
+    opacity: 1;
+  }
 }
 
 /* keyframe-declaration-no-important */
 @keyframes importantkf {
-  from { opacity: 0 !important }
+  from {
+    opacity: 0 !important;
+  }
 }
 
 /* media-feature-name-no-unknown */
 @media (not-a-feature: 1) {
-  .media-unknown-feature { color: red }
+  .media-unknown-feature {
+    color: red;
+  }
 }
 
 /* media-feature-name-value-no-unknown */
 @media (orientation: diagonal) {
-  .media-unknown-value { color: red }
+  .media-unknown-value {
+    color: red;
+  }
 }
 
 /* media-query-no-invalid */
 @media (min-width) {
-  .media-invalid { color: red }
+  .media-invalid {
+    color: red;
+  }
 }
 
 /* media-type-no-deprecated */
 @media tty {
-  .media-deprecated { color: red }
+  .media-deprecated {
+    color: red;
+  }
 }
 
 /* named-grid-areas-no-invalid */
@@ -179,13 +197,13 @@ a {
 color: red;
 
 /* no-irregular-whitespace (U+00A0 between selector and brace) */
-.irregular {
+.irregular  {
   color: red;
 }
 
 /* property-no-deprecated */
 .deprecated-prop {
-  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 /* property-no-unknown */
@@ -194,7 +212,7 @@ color: red;
 }
 
 /* selector-anb-no-unmatchable */
-.anb li:nth-child(0n+0) {
+.anb li:nth-child(0n + 0) {
   color: red;
 }
 
@@ -226,4 +244,6 @@ line2"] {
 
 /* no-invalid-double-slash-comments */
 // not a css comment
-.sacrificial { color: red }
+.sacrificial {
+  color: red;
+}

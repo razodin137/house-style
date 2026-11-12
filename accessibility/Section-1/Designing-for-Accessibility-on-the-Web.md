@@ -1,63 +1,70 @@
 # Designing for Accessibility on the Web
 
-* [General Resources](#general-resources)
-* [Tips for Writing Accessibly](#tips-for-writing-accessibly)
-* [Heading levels should be sequential](#heading-levels-should-be-sequential)
-* [Use appropriate landmarks for each section of page content](#use-appropriate-landmarks-for-each-section-of-page-content)
-* [Don't ever hide focus indicators](#dont-ever-hide-focus-indicators)
-* [Links should convey the full context of the action](#links-should-convey-the-full-context-of-the-action)
-* [Use non-visual spans to sprinkle in context](#use-non-visual-spans-to-sprinkle-in-context)
-* [Hide decorative and redundant elements (like avatar SVGs) from screen readers](#hide-decorative-and-redundant-elements-like-avatar-svgs-from-screen-readers)
-* [Screen reader must announce any changes that occur on screen](#screen-reader-must-announce-any-changes-that-occur-on-screen)
-* [Don’t use characters in CSS as separators; screen readers will speak them](#dont-use-characters-in-css-as-separators-screen-readers-will-speak-them)
-* [Include a skip navigation link so getting to the main page content is easy](#include-a-skip-navigation-link-so-getting-to-the-main-page-content-is-easy)
-* [Infinite scrolling role and state](#infinite-scrolling-role-and-state)
-* [Don't use the `title` attribute](#dont-use-the-title-attribute)
+- [General Resources](#general-resources)
+- [Tips for Writing Accessibly](#tips-for-writing-accessibly)
+- [Heading levels should be sequential](#heading-levels-should-be-sequential)
+- [Use appropriate landmarks for each section of page content](#use-appropriate-landmarks-for-each-section-of-page-content)
+- [Don't ever hide focus indicators](#dont-ever-hide-focus-indicators)
+- [Links should convey the full context of the action](#links-should-convey-the-full-context-of-the-action)
+- [Use non-visual spans to sprinkle in context](#use-non-visual-spans-to-sprinkle-in-context)
+- [Hide decorative and redundant elements (like avatar SVGs) from screen readers](#hide-decorative-and-redundant-elements-like-avatar-svgs-from-screen-readers)
+- [Screen reader must announce any changes that occur on screen](#screen-reader-must-announce-any-changes-that-occur-on-screen)
+- [Don’t use characters in CSS as separators; screen readers will speak them](#dont-use-characters-in-css-as-separators-screen-readers-will-speak-them)
+- [Include a skip navigation link so getting to the main page content is easy](#include-a-skip-navigation-link-so-getting-to-the-main-page-content-is-easy)
+- [Infinite scrolling role and state](#infinite-scrolling-role-and-state)
+- [Don't use the `title` attribute](#dont-use-the-title-attribute)
 
 ---
 
 ## General Resources
 
-* [W3C Web Accessibility Tutorials](https://www.w3.org/WAI/tutorials/): A great overview of how to make sure common elements are accessible.
-* [A11Y Project](https://a11yproject.com/checklist/): A handy checklist for determining how accessible a page is.
+- [W3C Web Accessibility Tutorials](https://www.w3.org/WAI/tutorials/): A great overview of how to make sure common elements are accessible.
+- [A11Y Project](https://a11yproject.com/checklist/): A handy checklist for determining how accessible a page is.
 
 ## Tips for Writing Accessibly
+
 Via [A List Apart](https://alistapart.com/article/standards-for-writing-accessibly/). Some highlights below.
 
 ### [Write Chronologically, Not Spatially](https://alistapart.com/article/standards-for-writing-accessibly/#section3)
+
 Rather than saying:
-* Click the OK button below to continue.
-* (A button that scrolls you to the top of a page): Go to top.
+
+- Click the OK button below to continue.
+- (A button that scrolls you to the top of a page): Go to top.
 
 Instead, say:
-* Next, select OK to continue.
-* Go to beginning.
+
+- Next, select OK to continue.
+- Go to beginning.
 
 ### [Describe the Action, Not the Behavior](https://alistapart.com/article/standards-for-writing-accessibly/#section6)
+
 Instead of microcopy that includes behavioral actions like:
-* Click
-* Tap
-* Press
-* See
+
+- Click
+- Tap
+- Press
+- See
 
 Try device-agnostic words that describe the action, irrespective of the interface, like:
-* Choose
-* Select
-* View
+
+- Choose
+- Select
+- View
 
 ## Heading levels should be sequential
 
-*Who is this for?* People using a screen reader
+_Who is this for?_ People using a screen reader
 
 Someone using a screenreader doesn't have the luxury of a visual representation of a page. Headings are often used to understand the structure and relationship of content on the screen, and improve in-page navigation. This seems obvious once you consider it. So when heading levels are used for styling hooks instead of semantic document structure, things get hairy.
 
-* Skipping heading ranks can be confusing and should be avoided where possible: Make sure that a `<h2>` is not followed directly by an `<h4>`, for example.
-* In fixed sections of the page, for example in sidebars, the heading ranks should not change depending on the ranks in the content area. In those cases, consistency across pages is more important.
+- Skipping heading ranks can be confusing and should be avoided where possible: Make sure that a `<h2>` is not followed directly by an `<h4>`, for example.
+- In fixed sections of the page, for example in sidebars, the heading ranks should not change depending on the ranks in the content area. In those cases, consistency across pages is more important.
 
 There are some useful browser extensions you can use to check this:
 
-* [a11yTools extension](http://pauljadam.com/extension.html) for macOS Safari
-* [HeadingsMap extension](https://addons.mozilla.org/en-US/firefox/addon/headingsmap/) for Firefox
+- [a11yTools extension](http://pauljadam.com/extension.html) for macOS Safari
+- [HeadingsMap extension](https://addons.mozilla.org/en-US/firefox/addon/headingsmap/) for Firefox
 
 More info and examples over at the W3C [Web Accessibility Tutorials page](https://www.w3.org/WAI/tutorials/page-structure/headings/).
 
@@ -67,33 +74,31 @@ ARIA landmarks and their HTML5 equivalents are an important way for people using
 
 Reference: https://www.w3.org/TR/wai-aria-practices/examples/landmarks/index.html
 
-
 ## Don't ever hide focus indicators
 
-*Who is this for?* Low vision and keyboard navigation.
+_Who is this for?_ Low vision and keyboard navigation.
 
 It's tempting to hide the visual indicators that appear around an element when it has focus. But they're critical for people who are low vision or rely on keyboard navigation. Instead of hiding them, consider styling them to be more on brand than the browser defaults.
 
 Bottom line: **Never** use `outline: none` in your code.
 
-
 ## Links should convey the full context of the action
 
-*Who is this for?* People using a screen reader
+_Who is this for?_ People using a screen reader
 
 Example 1
 
-When someone using a screen reader lands on a link with a name such as *"click here"*, that's all the screen reader will announce and the context of the action isn't clear. To improve this, wrap the entire line in a link so the full context of the action is conveyed.
+When someone using a screen reader lands on a link with a name such as _"click here"_, that's all the screen reader will announce and the context of the action isn't clear. To improve this, wrap the entire line in a link so the full context of the action is conveyed.
 
 ![Before only click here is spoken](../images/before-link.png)
 ![After, the link and preceding sentence is spoken](../images/after-link.png)
 
 Example 2
 
-You can use `aria-label` and `aria-labelledby` attributes to better convey the context on an element. As an example, "Edit" isn't really clear – edit *what?* exactly. Using this technique, **"Edit"** becomes "Calm @ extension, David and Jason get emails to this extension, **Edit** button"
+You can use `aria-label` and `aria-labelledby` attributes to better convey the context on an element. As an example, "Edit" isn't really clear – edit _what?_ exactly. Using this technique, **"Edit"** becomes "Calm @ extension, David and Jason get emails to this extension, **Edit** button"
 
-* Adding an attribute like `aria-label="This name is way better"` has precedence in the accessible name computation, and overrides a title or name the element would otherwise have.
-* Using `aria-labelledby="IDREF"` is similar, but instead hinges off of an `ID` defined elsewhere on the page. This element takes on the accessible name of the element with the associated `ID`.
+- Adding an attribute like `aria-label="This name is way better"` has precedence in the accessible name computation, and overrides a title or name the element would otherwise have.
+- Using `aria-labelledby="IDREF"` is similar, but instead hinges off of an `ID` defined elsewhere on the page. This element takes on the accessible name of the element with the associated `ID`.
 
 **Before:** ![Name before](../images/name-before.png)
 
@@ -127,30 +132,30 @@ Then just add this class to the element containing the support text:
 
 ## Hide decorative and redundant elements (like avatar SVGs) from screen readers
 
-*Who is this for?* People using a screen reader
+_Who is this for?_ People using a screen reader
 
 Some examples of elements that should be hidden from assistive technology:
 
-* Avatar SVG images: They're typically redundant to the name of the person, spelled out directly next to the avatar
-* Horizontal rules: `<hr>` elements are
+- Avatar SVG images: They're typically redundant to the name of the person, spelled out directly next to the avatar
+- Horizontal rules: `<hr>` elements are
 
 Often times avatars are redundant to the text content accompanying them. The same is true for decorative elements like horizontal rules. To improve the experience for someone using a screen reader, add the `aria-hidden="true"` attribute to remove these elements (and their children) from the accessibility tree. More about this [via Scott O'Hara](https://www.scottohara.me/blog/2019/05/22/contextual-images-svgs-and-a11y.html).
 
->It’s important to understand that ARIA can only affect the *semantics* of an element; it has no effect on the *behavior* of the element. While you can make an element hidden to screen readers with `aria-hidden=”true”`, that does not change the focus behavior for that element. For offscreen interactive content, you will often need to combine `aria-hidden=”true”` and `tabindex=”-1”` to make sure it’s truly removed from the keyboard flow. The proposed [inert attribute](https://github.com/WICG/inert) aims to make this easier by combining the behavior of both attributes. (Via [Google accessibility docs](https://developers.google.com/web/fundamentals/accessibility/how-to-review))
+> It’s important to understand that ARIA can only affect the _semantics_ of an element; it has no effect on the _behavior_ of the element. While you can make an element hidden to screen readers with `aria-hidden=”true”`, that does not change the focus behavior for that element. For offscreen interactive content, you will often need to combine `aria-hidden=”true”` and `tabindex=”-1”` to make sure it’s truly removed from the keyboard flow. The proposed [inert attribute](https://github.com/WICG/inert) aims to make this easier by combining the behavior of both attributes. (Via [Google accessibility docs](https://developers.google.com/web/fundamentals/accessibility/how-to-review))
 
 ## Screen reader must announce any changes that occur on screen
 
-*Who is this for?* People using a screen reader
+_Who is this for?_ People using a screen reader
 
 Some examples include:
 
-* Acknowledgement that a user initiated action completed, and whether or not it was successful.
-* New content appearing on screen, like a chat line or new message.
-* Number of options/results and currently focused option/result in a picker.
+- Acknowledgement that a user initiated action completed, and whether or not it was successful.
+- New content appearing on screen, like a chat line or new message.
+- Number of options/results and currently focused option/result in a picker.
 
 Resources:
 
-* The chapter on Notifications in the [Inclusive Components eBook](https://github.com/basecamp/accessibility.wiki/blob/master/files/Inclusive_Components_Heydon_Pickering.pdf) covers this well.
+- The chapter on Notifications in the [Inclusive Components eBook](https://github.com/basecamp/accessibility.wiki/blob/master/files/Inclusive_Components_Heydon_Pickering.pdf) covers this well.
 
 ## Don’t use characters in CSS as separators; screen readers will speak them
 
@@ -170,7 +175,7 @@ After adding the skip link be sure to test it across platforms. Android and iOS 
 
 ## Infinite scrolling role and state
 
-Pages that use infinite scroll should use `role="feed"` to trigger the *browse* mode used by some screen readers. Also, you need to set `aria-busy="true"` while the content is loading, and `aria-busy="false"` once loading is complete.
+Pages that use infinite scroll should use `role="feed"` to trigger the _browse_ mode used by some screen readers. Also, you need to set `aria-busy="true"` while the content is loading, and `aria-busy="false"` once loading is complete.
 
 Example code snippet:
 

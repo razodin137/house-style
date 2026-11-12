@@ -14,9 +14,9 @@ These are some techniques for finding and fixing the most common accessibility v
 
 ## Scan for violations using a browser extension
 
-*Who is this for?* General accessibility/usability
+_Who is this for?_ General accessibility/usability
 
-There are a few browser extensions designed to detect accessibility issues, and explain how to fix them. Keep in mind these won't catch all accessibility issues, only a subset of them. These checks should be run *both* against the normal desktop sized viewport, and again for mobile views.
+There are a few browser extensions designed to detect accessibility issues, and explain how to fix them. Keep in mind these won't catch all accessibility issues, only a subset of them. These checks should be run _both_ against the normal desktop sized viewport, and again for mobile views.
 
 - My current favorite for Chrome and Firefox is [axe](https://www.deque.com/axe/)
 - [Chrome's built-in accessibility audit](https://developers.google.com/web/tools/chrome-devtools/accessibility/reference)
@@ -34,13 +34,13 @@ The column on the right lists all of the accessibility violations. When you sele
 
 ## Every focusable element on the page should have an outline or other visible indicator of focus.
 
-*Who is this for?* Users with low vision
+_Who is this for?_ Users with low vision
 
 This is pretty simple to check. Just tab through each screen and make sure every element you land on has an outline or other visual indicator of focus.
 
 ## Make sure heading levels are semantic
 
-*Who is this for?* People using a screen reader, those with cognitive disabilities.
+_Who is this for?_ People using a screen reader, those with cognitive disabilities.
 
 For someone using a screen reader, heading levels are important for getting an overview of the structure of a page. Therefore, heading levels should first and foremost be used for semantics, and only secondarily for styling.
 
@@ -60,7 +60,7 @@ Further reading about the importance of headings for people using assistive tech
 
 ## Color contrast
 
-*Who is this for?* People with low vision and color blindness
+_Who is this for?_ People with low vision and color blindness
 
 When the contrast of an element is too similar to that of another its background or label it can be difficult to see. These failures will get raised by the browser extensions. There are two dimensions to consider when thinking about contast: <span style="color:cyan">color</span> and <span style="font-size:24px">size</span>.
 
@@ -86,7 +86,7 @@ More resources:
 
 ## Hide decorative elements from assistive technology
 
-*Who is this for?* People using a screen reader
+_Who is this for?_ People using a screen reader
 
 Elements that serve only a purpose visually or repeat information that's conveyed via alternate means, such as by a nearby text label, should be hidden from screen readers to prevent annoying redudancy. Some common examples include horizontal rule `<hr>` elements, or avatars when the name of the person they refer to are repeated nearby.
 
@@ -94,6 +94,6 @@ It's easiest to test this out by [navigating through the page using a screen rea
 
 ## Review the page using VoiceOver (Mac) or NVDA (Win) screen reader
 
-*Who is this for?* People who are blind, low vision, and motor function challenges
+_Who is this for?_ People who are blind, low vision, and motor function challenges
 
 Jump over to [Screen reader setup and testing](../Section-2/Screen-reader-setup-and-testing.md) for a rundown of testing using a screen reader.

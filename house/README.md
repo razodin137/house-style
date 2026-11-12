@@ -11,6 +11,8 @@ npx house fix
 
 `house check` reports without writing. `house fix` is the cleanup command: it applies each lane's fixers and then re-runs the checks, so an unfixable violation still fails.
 
+`house fix` also extracts inline `<style>` and executable `<script>` blocks into sibling `.css`/`.js` files before the lanes run, so those files are checked and formatted in the same invocation. `house check` never writes: it accepts inline blocks that Prettier already considers formatted, and fails unformatted ones with `run house fix`. Extraction is skipped by `--list`, by `signoff`, and when the html lane is not selected.
+
 ## Fixing locally
 
 Run `house fix` before handing work over or opening a pull request:
@@ -21,7 +23,7 @@ house fix src lib      # only these paths
 house check            # the read-only gate CI should run
 ```
 
-Fixers cover `eslint --fix`, `stylelint --fix`, `prettier --write`, `html-validate --fix`, `biome format --write`, `rubocop -a`, `shfmt -w`, and `ruff check --fix` plus `ruff format`. For `.html` files, `prettier --write` rewrites the contents of `<style>` and `<script>` blocks but never the markup. Exit `0` means the tree is clean, `1` means something remains that needs a source change, and `2` means a lane has files but no config or tool.
+Fixers cover `eslint --fix`, `stylelint --fix`, `prettier --write`, `html-validate --fix`, `biome format --write`, `rubocop -a`, `shfmt -w`, and `ruff check --fix` plus `ruff format`. Inline HTML blocks are extracted first, and the new `.css`/`.js` files go through their own fixers in the same run. JSON-like blocks that stay inline are formatted in place with Prettier. Exit `0` means the tree is clean, `1` means something remains that needs a source change, and `2` means a lane has files but no config or tool.
 
 ### Optional pre-commit hook
 
@@ -36,21 +38,31 @@ The hook fixes only the files staged for the commit and stages the result. It ne
 
 ## Lanes
 
-Lanes are chosen by file type, not by language. That matters at the edges: a `.css` file is always checked with the CSS Stylelint config and never with the SCSS one, and an HTML project with no JavaScript still gets its HTML checked. The HTML lane formats embedded `<style>` and `<script>` bodies with Prettier, but never the markup: Prettier's lowercased doctype and `<br />` output would fight `doctype-style: uppercase` and `void-style: omit`.
+Lanes are chosen by file type, not by language. That matters at the edges: a `.css` file is always checked with the CSS Stylelint config and never with the SCSS one, and an HTML project with no JavaScript still gets its HTML checked. The HTML lane checks embedded `<style>` and `<script>` bodies with Prettier, but never reformats the markup: Prettier's lowercased doctype and `<br />` output would fight `doctype-style: uppercase` and `void-style: omit`. `house fix` extracts the CSS and JavaScript bodies into their own lanes and only formats the JSON-like blocks that stay inline.
 
-| Lane     | Files                                                            | Check steps                                                          | Fix steps                                                                |
-| -------- | ---------------------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `js`     | `.js`, `.mjs`, `.cjs`, `.jsx`                                    | `eslint --max-warnings 0`                                            | `eslint --fix`, then check                                               |
-| `css`    | `.css`                                                           | `prettier --check`, `stylelint`                                      | `stylelint --fix`, `prettier --write`, then check                        |
-| `scss`   | `.scss`                                                          | `prettier --check`, `stylelint`                                      | `stylelint --fix`, `prettier --write`, then check                        |
-| `html`   | `.html`, `.htm`                                                  | `html-validate`, `prettier --check` on embedded `<style>`/`<script>` | `html-validate --fix`, `prettier --write` on embedded blocks, then check |
-| `md`     | `.md`, `.markdown`                                               | `biome format`                                                       | `biome format --write`, then check                                       |
-| `yaml`   | `.yaml`, `.yml`                                                  | `biome format`                                                       | `biome format --write`, then check                                       |
-| `ruby`   | `.rb`, `.rake`, `.gemspec`, `Gemfile`, `Rakefile`, ruby shebangs | `rubocop`                                                            | `rubocop -a`, then check                                                 |
-| `shell`  | `.sh`, `.bash`, `.zsh`, `.ksh`, shell shebangs                   | `shellcheck --severity=info`, `shfmt -i 2 -d`                        | `shfmt -i 2 -w`, then check                                              |
-| `python` | `.py`, `.pyi`, python shebangs                                   | `ruff check`, `ruff format --check`                                  | `ruff check --fix`, `ruff format`, then check                            |
+| Lane     | Files                                                            | Check steps                                      | Fix steps                                                                            |
+| -------- | ---------------------------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| `js`     | `.js`, `.mjs`, `.cjs`, `.jsx`                                    | `eslint --max-warnings 0`                        | `eslint --fix`, then check                                                           |
+| `css`    | `.css`                                                           | `prettier --check`, `stylelint`                  | `stylelint --fix`, `prettier --write`, then check                                    |
+| `scss`   | `.scss`                                                          | `prettier --check`, `stylelint`                  | `stylelint --fix`, `prettier --write`, then check                                    |
+| `html`   | `.html`, `.htm`                                                  | embedded block format check, `html-validate`     | extract CSS/JS, `html-validate --fix`, format remaining inline blocks, then check    |
+| `md`     | `.md`, `.markdown`                                               | `biome format`                                   | `biome format --write`, then check                                                   |
+| `yaml`   | `.yaml`, `.yml`                                                  | `biome format`                                   | `biome format --write`, then check                                                   |
+| `ruby`   | `.rb`, `.rake`, `.gemspec`, `Gemfile`, `Rakefile`, ruby shebangs | `rubocop`                                        | `rubocop -a`, then check                                                             |
+| `shell`  | `.sh`, `.bash`, `.zsh`, `.ksh`, shell shebangs                   | `shellcheck --severity=info`, `shfmt -i 2 -d`    | `shfmt -i 2 -w`, then check                                                          |
+| `python` | `.py`, `.pyi`, python shebangs                                   | `ruff check`, `ruff format --check`              | `ruff check --fix`, `ruff format`, then check                                        |
 
 Ruby uses `bundle exec rubocop` when the project has a `Gemfile`.
+
+## Inline CSS and JavaScript
+
+The html lane treats embedded styles and executable scripts as code that belongs in its own lane. In one `house fix` run, each non-empty `<style>` or `<script>` block is written to a sibling file (for example `index.css` and `index.js`), the element is replaced with `<link rel="stylesheet" href="...">` or `<script src="..."></script>`, and the file list is regrouped so the new `.css`/`.js` files are linted and formatted by their own lanes. Subsequent blocks and name collisions are numbered `-2`, `-3`, and so on.
+
+`house check` never writes, and it accepts either layout. Extracted files pass. So does a self-contained page whose inline blocks Prettier already considers formatted. An unformatted block fails the lane with exit 1 and `embedded <style> is not formatted; run house fix`. `house fix` still normalizes CSS and JavaScript to sibling files, so a self-contained page passes `house check` until the next `house fix`.
+
+Keeping the extracted layout therefore means a project needs the css and js lane configs as well as the html one; `house fix` exits 2 after extraction if they are missing. Inline `application/json`, `application/ld+json`, import maps, speculation rules, template scripts, and scripts that already have `src` stay inline on purpose; the JSON-like ones are formatted in place.
+
+The operation is also available on its own as `house extract` (`--check` is the default, `--write` extracts), but `house fix` is the normal entry point because it also runs the lanes.
 
 ## Config resolution
 
@@ -62,7 +74,7 @@ For each lane, `house` uses this order:
 
 The bundled Ruby and Python configs are copies of the gem and vendored configs; the test suite pins them so they cannot drift.
 
-A lane with files but no config, or a lane whose tool is not installed, fails with exit code 2. It does not silently skip. The HTML lane resolves a Prettier config as well as an html-validate config, because it formats the embedded `<style>` and `<script>` bodies.
+A lane with files but no config, or a lane whose tool is not installed, fails with exit code 2. It does not silently skip. The HTML lane needs a Prettier config and tool only when it actually has inline blocks to check or format; an HTML file with no blocks needs only the html-validate config.
 
 ## Files
 
@@ -81,6 +93,7 @@ house check --lane css,scss
 house check [options] [paths...]
 house fix [options] [paths...]
 house signoff [options] [paths...]
+house extract [--check|--write] [paths...]
 house hook install [--force]
 
 -l, --lane <id>    only run these lanes (repeat or comma-separate)
@@ -92,7 +105,7 @@ house hook install [--force]
 -V, --version      show the version
 ```
 
-`house hook install` accepts `--force` to replace an existing hook and `--json` for a machine-readable result.
+`house extract` accepts `--check` (the default) to report inline blocks without writing, or `--write` to extract them. `house hook install` accepts `--force` to replace an existing hook and `--json` for a machine-readable result.
 
 Signoff options:
 
@@ -128,4 +141,4 @@ With no context it signs off the default `signoff` status. `--fail` reports a fa
 npm test
 ```
 
-The tests run the real CLI against temporary projects with fake tools on `PATH`, so they pin lane detection, the CSS/SCSS split, config precedence, fix-then-verify order, embedded-block formatting, and exit codes without depending on the linters being installed.
+The tests run the real CLI against temporary projects with fake tools on `PATH`, so they pin lane detection, the CSS/SCSS split, config precedence, fix-then-verify order, inline extraction and embedded-block checking, and exit codes without depending on the linters being installed.

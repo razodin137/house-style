@@ -26,25 +26,27 @@ npm install --save-dev \
 
 Lanes are picked by file type, not by language:
 
-| Lane     | Files                                                            | Runs                                                                                                 |
-| -------- | ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `js`     | `.js`, `.mjs`, `.cjs`, `.jsx`                                    | ESLint with `@razodin137/eslint-config`, `--max-warnings 0`                                          |
-| `css`    | `.css`                                                           | Stylelint with `@razodin137/stylelint-config-css`, then Prettier                                     |
-| `scss`   | `.scss`                                                          | Stylelint with `@razodin137/stylelint-config-scss`, then Prettier                                    |
-| `html`   | `.html`, `.htm`                                                  | html-validate with `@razodin137/html-validate-config`, and Prettier on embedded `<style>`/`<script>` |
-| `md`     | `.md`, `.markdown`                                               | Biome with `@razodin137/biome-config`                                                                |
-| `yaml`   | `.yaml`, `.yml`                                                  | Biome with `@razodin137/biome-config`                                                                |
-| `ruby`   | `.rb`, `.rake`, `.gemspec`, `Gemfile`, `Rakefile`, ruby shebangs | RuboCop, via `bundle exec` when a `Gemfile` is present                                               |
-| `shell`  | `.sh`, `.bash`, `.zsh`, `.ksh`, shell shebangs                   | ShellCheck at info severity, then shfmt                                                              |
-| `python` | `.py`, `.pyi`, python shebangs                                   | `ruff check`, then `ruff format --check`                                                             |
+| Lane     | Files                                                            | Runs                                                                                |
+| -------- | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `js`     | `.js`, `.mjs`, `.cjs`, `.jsx`                                    | ESLint with `@razodin137/eslint-config`, `--max-warnings 0`                         |
+| `css`    | `.css`                                                           | Stylelint with `@razodin137/stylelint-config-css`, then Prettier                    |
+| `scss`   | `.scss`                                                          | Stylelint with `@razodin137/stylelint-config-scss`, then Prettier                   |
+| `html`   | `.html`, `.htm`                                                  | embedded block format check, then html-validate with `@razodin137/html-validate-config` |
+| `md`     | `.md`, `.markdown`                                               | Biome with `@razodin137/biome-config`                                               |
+| `yaml`   | `.yaml`, `.yml`                                                  | Biome with `@razodin137/biome-config`                                               |
+| `ruby`   | `.rb`, `.rake`, `.gemspec`, `Gemfile`, `Rakefile`, ruby shebangs | RuboCop, via `bundle exec` when a `Gemfile` is present                              |
+| `shell`  | `.sh`, `.bash`, `.zsh`, `.ksh`, shell shebangs                   | ShellCheck at info severity, then shfmt                                             |
+| `python` | `.py`, `.pyi`, python shebangs                                   | `ruff check`, then `ruff format --check`                                            |
 
-A `.css` file never goes through the SCSS config and a `.scss` file never goes through the CSS config: each lane gets its own config. An HTML-only project runs the HTML lane without needing a JS lane, but it does need the html-validate and Prettier configs: the HTML lane formats embedded `<style>` and `<script>` bodies with Prettier, though never the markup.
+A `.css` file never goes through the SCSS config and a `.scss` file never goes through the CSS config: each lane gets its own config. An HTML-only project with no inline blocks runs the HTML lane without needing a JS lane.
+
+The html lane extracts embedded CSS and JavaScript into linked files, so inline code is held to the same rules as code in its own file. `house fix` does the extraction and then runs every lane against the new files in the same invocation. `house check` never writes and accepts either layout: extracted files pass, and so does a self-contained page whose inline blocks are already formatted; only unformatted blocks fail with a "run house fix" message. Keeping the extracted layout means a page needs the css and js lane configs as well as the html one. Inline JSON, JSON-LD, import maps, speculation rules, template scripts, and scripts that already have `src` stay inline; the JSON-like ones are formatted in place.
 
 Project config wins. When a project has no `eslint.config.*`, stylelint config, Prettier config, html-validate config, or Biome config, the lane uses the matching `@razodin137/*` package installed in the project. Ruby and Python fall back to configs bundled with `house`. A missing tool or missing config fails loudly with exit 2 instead of skipping the lane.
 
 ## Fixing locally
 
-`house fix` is the cleanup command: it applies every lane's fixer and then re-runs the checks, so the tree it reports on is the tree it actually wrote. `house check` stays the read-only gate that CI runs.
+`house fix` is the cleanup command: it extracts inline HTML blocks, applies every lane's fixer, and then re-runs the checks, so the tree it reports on is the tree it actually wrote. `house check` stays the read-only gate that CI runs: it reports inline blocks instead of extracting them, and exits `1` until `house fix` has run.
 
 ```bash
 npx house fix              # clean up every file house can see
@@ -289,7 +291,7 @@ The [fixtures](/biome-config/fixtures) pin the ruleset: `good.{md,yaml}` pass cl
 
 What the formatter owns stays out of the linter, so nothing fights the fixer. Stylelint's own formatting rules are deprecated, and [Prettier](https://prettier.io) is their recommended replacement, so we use it to format our CSS and SCSS. You'll need Prettier 3 or higher to use our shared config, which requires Node 20.19 or newer.
 
-HTML markup and JavaScript are deliberately out of scope. Prettier always writes void elements as `<br />` with no option to omit the slash, and it lowercases `<!DOCTYPE html>`; both would fight our html-validate `void-style: omit` and `doctype-style: uppercase` rules. So never point it at the HTML markup. The HTML lane does run Prettier on the _contents_ of `<style>` and `<script>` blocks in `.html` files, which is usually where a self-contained page keeps its CSS and JS; the markup stays with html-validate. Blocks with a `src`, an unsupported `type`, or content Prettier cannot parse are left untouched. And Prettier can't express the house's spaced array brackets, so never point it at `.js` files either — those stay with the `@stylistic/js` rules and `eslint --fix`.
+HTML markup and JavaScript are deliberately out of scope. Prettier always writes void elements as `<br />` with no option to omit the slash, and it lowercases `<!DOCTYPE html>`; both would fight our html-validate `void-style: omit` and `doctype-style: uppercase` rules. So never point it at the HTML markup. The HTML lane does use Prettier on the _contents_ of `<style>` and `<script>` blocks in `.html` files, which is where a self-contained page keeps its CSS and JS, while the markup stays with html-validate. `house fix` extracts the CSS and JavaScript into their own lanes first, then formats the JSON-like blocks that stay inline. Blocks with a `src`, an unsupported `type`, or content Prettier cannot parse are left untouched. And Prettier can't express the house's spaced array brackets, so never point it at `.js` files either — those stay with the `@stylistic/js` rules and `eslint --fix`.
 
 To use our defaults, add the `@razodin137/prettier-config` package and reference it from `package.json`:
 
@@ -324,6 +326,8 @@ The configuration is based on the [recommended preset](https://html-validate.org
 
 Four of those additions are accessibility checks drawn from the vendored [Basecamp accessibility guide](/accessibility/README.md): semantic heading order, labelled inputs, resolvable `for` and `aria-labelledby` references, and inline SVGs kept out of the tab order. The rest of that guide is vendored as reference, not as a ruleset — keyboard order, focus visibility, colour contrast on rendered pages, and screen-reader comprehension need a person, not a linter.
 
+house checks the embedded CSS and JavaScript too, but not by formatting the HTML string. `house fix` writes each inline `<style>` and executable `<script>` block to a sibling `.css` or `.js` file, replaces it with a `<link>` or `src` script, and then lets the css and js lanes format and lint those files in the same run. `house check` refuses to write but accepts either layout: extracted files pass, and so does a self-contained page whose inline blocks are already Prettier-formatted. Only an unformatted block fails, with `embedded <style> is not formatted; run house fix`. Keeping the extracted layout needs the css and js lane configs in addition to the html one.
+
 To see the rules, read the [config itself](/html-validate-config/index.js).
 
 To use our ruleset as a baseline, add the `@razodin137/html-validate-config` package:
@@ -349,7 +353,7 @@ And extend it in your `.htmlvalidate.json`:
 
 The [fixtures](/html-validate-config/fixtures) pin the ruleset: `good.html` passes clean, and `bad.html` fails with one violation per rule. Run them from the package directory with `npm test`.
 
-For self-contained pages, `house` also formats the contents of `<style>` and `<script>` blocks with Prettier, using the same Prettier config resolution as the CSS lanes. It never reformats the markup, so the uppercase doctype and `void-style: omit` rules stay authoritative. Blocks with a `src`, an unsupported `type`, or content Prettier cannot parse are skipped.
+For self-contained pages, `house check` verifies the contents of `<style>` and `<script>` blocks with Prettier, using the same Prettier config resolution as the CSS lanes, and `house fix` formats the JSON-like blocks that remain after extraction. It never reformats the markup, so the uppercase doctype and `void-style: omit` rules stay authoritative. Blocks with a `src`, an unsupported `type`, or content Prettier cannot parse are skipped.
 
 ## Screenshots
 

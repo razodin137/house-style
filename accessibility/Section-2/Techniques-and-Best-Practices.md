@@ -16,8 +16,7 @@
 
 ### Basic overview
 
->It’s important to understand that ARIA can only affect the *semantics* of an element; it has no effect on the *behavior* of the element. While you can make an element hidden to screen readers with `aria-hidden=”true”`, that does not change the focus behavior for that element. For offscreen interactive content, you will often need to combine `aria-hidden=”true”` and `tabindex=”-1”` to make sure it’s truly removed from the keyboard flow. The proposed [inert attribute](https://github.com/WICG/inert) aims to make this easier by combining the behavior of both attributes. (Via [Google accessibility docs](https://developers.google.com/web/fundamentals/accessibility/how-to-review))
-
+> It’s important to understand that ARIA can only affect the _semantics_ of an element; it has no effect on the _behavior_ of the element. While you can make an element hidden to screen readers with `aria-hidden=”true”`, that does not change the focus behavior for that element. For offscreen interactive content, you will often need to combine `aria-hidden=”true”` and `tabindex=”-1”` to make sure it’s truly removed from the keyboard flow. The proposed [inert attribute](https://github.com/WICG/inert) aims to make this easier by combining the behavior of both attributes. (Via [Google accessibility docs](https://developers.google.com/web/fundamentals/accessibility/how-to-review))
 
 ### Hiding SVGs (like avatars) from screen readers
 
@@ -44,22 +43,22 @@ https://www.w3.org/TR/wai-aria-practices/examples/landmarks/index.html
 
 ## Links: Mixed decorated + undecorated links
 
-*Who is this for?* People using a screen reader
+_Who is this for?_ People using a screen reader
 
-When someone using a screen reader lands on a link with a name such as *"click here"*, that's exactly what the screen reader will announce and the context is totally unclear. To improve this, you can wrap the entire line in a link so the full context is conveyed.
+When someone using a screen reader lands on a link with a name such as _"click here"_, that's exactly what the screen reader will announce and the context is totally unclear. To improve this, you can wrap the entire line in a link so the full context is conveyed.
 
 This is useful when you want part of the link to be decorated, such as "click here", but the explanatory text before the link is necessary for someone using a screen reader.
 
-*Example:* ["Change this" button isn't self explanatory for people using a screen reader](https://3.basecamp.com/2914079/buckets/11898988/todos/1851452489) via Haystack: Bundles
+_Example:_ ["Change this" button isn't self explanatory for people using a screen reader](https://3.basecamp.com/2914079/buckets/11898988/todos/1851452489) via Haystack: Bundles
 
-*Technique:* https://github.com/basecamp/haystack/commit/6e9c6f350d92176cd922c7583edf07ff2db1a00a
+_Technique:_ https://github.com/basecamp/haystack/commit/6e9c6f350d92176cd922c7583edf07ff2db1a00a
 
 ![mixed links](/images/mixed-link.png)
 
 ## Managing focus on navigation/page load
 
-* For single page applications, focus should be set to the first `<h1>` on page load using the Javascript `focus()`, and a `tabindex="-1"` on the element.
-* In this **rare** case the focus indicator on the `<h1>` should be overridden with:
+- For single page applications, focus should be set to the first `<h1>` on page load using the Javascript `focus()`, and a `tabindex="-1"` on the element.
+- In this **rare** case the focus indicator on the `<h1>` should be overridden with:
 ```
 h1:focus {
   outline: none;

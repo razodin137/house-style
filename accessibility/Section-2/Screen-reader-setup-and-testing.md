@@ -2,7 +2,7 @@
 
 While the experience of using a screen reader is largely consistent, results vary greatly across platform + browser combinations. When evaluating your feature for screen reader and keyboard accessibility it's recommended to focus on one combination, then perform a run through using a secondary variant once any necessary remediations have been made.
 
-*Note:* Screen reader and keyboard accessibility are distinctly separate, though testing can be combined to identify issues simultaneously.
+_Note:_ Screen reader and keyboard accessibility are distinctly separate, though testing can be combined to identify issues simultaneously.
 
 Screen reader + platform combinations we test against at Basecamp:
 
@@ -28,9 +28,9 @@ Screen reader + platform combinations we test against at Basecamp:
 
 In essence:
 
-1. Run through VoiceOver Training if you haven't used it before *(System Preferences > Accessibility > VoiceOver > Open VoiceOver Training…)*
+1. Run through VoiceOver Training if you haven't used it before _(System Preferences > Accessibility > VoiceOver > Open VoiceOver Training…)_
 2. Load up the page you want to test in Safari.
-3. Turn on VoiceOver by pressing your TouchID button three times, or using the shortcut defined in *System Preferences > Shortcuts > Accessibility*. I've set mine to `⌥ (option) + `\`. [Here's how to do this in macOS settings](../images/VO-shortcut.png).
+3. Turn on VoiceOver by pressing your TouchID button three times, or using the shortcut defined in _System Preferences > Shortcuts > Accessibility_. I've set mine to `⌥ (option) + `\`. [Here's how to do this in macOS settings](../images/VO-shortcut.png).
 4. Begin tabbing through the page, ensuring that each thing that gets announced makes sense, and that every element on the page can be accessed and manipulated.
 
 ### Things to be aware of
@@ -51,17 +51,19 @@ In essence:
 1. Install Parallels and Windows.
 2. On the Windows VM, install [NVDA](https://www.nvaccess.org).
 3. On your Mac, install [Karabiner](https://pqrs.org/osx/karabiner/index.html).
-4. In Karabiner under the *Simple Modifications* tab, add a mapping from `caps_lock` to `insert`.
-5. In Karabiner under the *Function Keys* tab, check the box at the bottom labeled *Use all F1, F2, etc. keys as standard function keys*.
-6. Disable your Mac `caps lock` key. Under *System Preferences > Keyboard > Modifier keys… button*, choose "No Action" for `Caps Lock` on your internal and external keyboards.
-7. If you have a TouchBar afflicted MacBook Pro: In *System Preferences > Keyboard > Shortcuts > Function Keys*, add Parallels or VMWare to your list of apps that should show function keys instead of the default.
+4. In Karabiner under the _Simple Modifications_ tab, add a mapping from `caps_lock` to `insert`.
+5. In Karabiner under the _Function Keys_ tab, check the box at the bottom labeled _Use all F1, F2, etc. keys as standard function keys_.
+6. Disable your Mac `caps lock` key. Under _System Preferences > Keyboard > Modifier keys… button_, choose "No Action" for `Caps Lock` on your internal and external keyboards.
+7. If you have a TouchBar afflicted MacBook Pro: In _System Preferences > Keyboard > Shortcuts > Function Keys_, add Parallels or VMWare to your list of apps that should show function keys instead of the default.
 
 Resources:
+
 - Similar to the VoiceOver training linked above but for [learning to use NVDA + Firefox](https://www.youtube.com/watch?v=Jao3s_CwdRU&list=PLNYkxOF6rcICWx0C9LVWWVqvHlYJyqw7g&index=4).
 - [Deque guide to NVDA shortcuts](https://dequeuniversity.com/screenreaders/nvda-keyboard-shortcuts#nvda-nvda_shortcut_keys)
 - [Webaim guide to NVDA shortcuts](https://webaim.org/resources/shortcuts/nvda)
 
 ### Tips
+
 - If web app keyboard shortcuts aren't working, try olding your NVDA key while pressing the shortcut key. E.g. `NVDA` + `J/K` to navigate message list.
 
 ## JAWS on Windows
@@ -73,10 +75,10 @@ In addition to JAWS, you'll want to install [Karabiner](https://pqrs.org/osx/kar
 1. Install Parallels and Windows.
 2. Install [JAWS](https://www.freedomscientific.com/products/software/jaws/).
 3. Install [Karabiner](https://pqrs.org/osx/karabiner/index.html).
-4. In Karabiner under the *Simple Modifications* tab, add a mapping from `caps_lock` to `insert`.
-5. In Karabiner under the *Function Keys* tab, check the box at the bottom labeled *Use all F1, F2, etc. keys as standard function keys*.
-6. Disable your Mac `caps lock` key. Under *System Preferences > Keyboard > Modifier keys… button*, choose "No Action" for `Caps Lock` on your internal and external keyboards.
-7. If you have a TouchBar afflicted MacBook Pro: In *System Preferences > Keyboard > Shortcuts > Function Keys*, add Parallels or VMWare to your list of apps that should show function keys instead of the default.
+4. In Karabiner under the _Simple Modifications_ tab, add a mapping from `caps_lock` to `insert`.
+5. In Karabiner under the _Function Keys_ tab, check the box at the bottom labeled _Use all F1, F2, etc. keys as standard function keys_.
+6. Disable your Mac `caps lock` key. Under _System Preferences > Keyboard > Modifier keys… button_, choose "No Action" for `Caps Lock` on your internal and external keyboards.
+7. If you have a TouchBar afflicted MacBook Pro: In _System Preferences > Keyboard > Shortcuts > Function Keys_, add Parallels or VMWare to your list of apps that should show function keys instead of the default.
 
 Resources:
 Using JAWS takes some practice. The [WebAIM guide to keyboard shortcuts for JAWS](https://webaim.org/resources/shortcuts/jaws) is a good place to start.

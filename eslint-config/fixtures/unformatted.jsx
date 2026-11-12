@@ -3,20 +3,22 @@
  * rewrites unformatted.jsx to match it.
  */
 
-function useEffect( callback ){
-  callback();
+function useEffect(callback) {
+  callback()
 }
 
-function Greeting( { name } ){
-  useEffect(()=>{
-    console.log( name );
-  },[ name ]);
+function Greeting({ name }) {
+  useEffect(() => {
+    console.log(name)
+  }, [ name ])
 
-  const greeting=`Hello, ${ name }`;
+  const greeting = `Hello, ${name}`
 
-  return <p className="greeting">
-    {greeting}
-    </p>;
+  return (
+    <p className="greeting">
+      {greeting}
+    </p>
+  )
 }
 
-export { Greeting };
+export { Greeting }

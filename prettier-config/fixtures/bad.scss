@@ -1,15 +1,15 @@
 $ink: #123456;
 
 .card {
-    @include card-border;
-    padding: 1rem 2rem;
+  @include card-border;
+  padding: 1rem 2rem;
 
-    &__title {
-        color: $ink;
-        font-family: 'Helvetica Neue', Helvetica, sans-serif;
-    }
+  &__title {
+    color: $ink;
+    font-family: "Helvetica Neue", Helvetica, sans-serif;
+  }
 
-    &:hover {
-        background: darken($ink, 10%);
-    }
+  &:hover {
+    background: darken($ink, 10%);
+  }
 }

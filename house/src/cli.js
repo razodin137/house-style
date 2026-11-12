@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs"
 import { join } from "node:path"
 import { parseArgs } from "node:util"
 import { buildPlan } from "./commands.js"
+import { extractFiles } from "./extract.js"
 import { groupByLane, discoverFiles } from "./files.js"
 import { installHook } from "./hooks.js"
 import { lanes, laneIds } from "./lanes.js"
@@ -73,6 +74,7 @@ function usage() {
     "  house check [options] [paths...]",
     "  house fix [options] [paths...]",
     "  house signoff [options] [paths...]",
+    "  house extract [--check|--write] [paths...]",
     "  house hook install [--force]",
     "",
     "Lanes are chosen by file type, not language:",
@@ -102,6 +104,10 @@ function usage() {
     "  -f, --force           sign off without checking the commit is pushed",
     "      --fail            post gh signoff fail when the check fails",
     "",
+    "Extract options:",
+    "      --check           report inline <style>/<script> blocks (default)",
+    "      --write           extract them into sibling .css/.js files",
+    "",
     "Exit codes: 0 clean, 1 checks failed, 2 configuration or tool error."
   ].join("\n")
 }
@@ -122,6 +128,8 @@ function parse(argv) {
         url: { type: "string" },
         force: { type: "boolean", short: "f" },
         fail: { type: "boolean" },
+        write: { type: "boolean" },
+        check: { type: "boolean" },
         help: { type: "boolean", short: "h" },
         version: { type: "boolean", short: "V" }
       }
@@ -259,7 +267,11 @@ function runLanes(toRun, command, cwd, values, color) {
       lane.id === "css" || lane.id === "scss" || lane.id === "html"
         ? resolvePrettierConfig(cwd)
         : null
-    const error = config.error ?? prettier?.error ?? null
+    // An HTML file with no inline blocks never needs Prettier, so a missing
+    // HTML Prettier config is only reported by the embedded-block step when
+    // there is actually something to format.
+    const prettierError = lane.id === "html" ? null : prettier?.error
+    const error = config.error ?? prettierError ?? null
 
     if (error) {
       laneResults.push({
@@ -340,6 +352,12 @@ function reportLanes(command, laneResults, checked, color, verbose) {
   return lines
 }
 
+function summarizeExtraction({ results, created }) {
+  const blocks = results.reduce((total, entry) => total + entry.blocks.length, 0)
+  if (blocks === 0) return null
+  return { htmlFiles: results.length, blocks, created: [ ...created ] }
+}
+
 function hookUsage() {
   return [
     "house hook — optional pre-commit integration",
@@ -391,6 +409,22 @@ function runHook(positionals, values, cwd) {
   process.stdout.write(`house hook: installed ${result.path}\n`)
   process.stdout.write("house hook: optional; it never blocks a commit, and house check remains the gate\n")
   return 0
+}
+
+function reportExtract(results) {
+  let failed = false
+
+  for (const { file, blocks } of results) {
+    for (const block of blocks) {
+      const tag = block.kind === "css" ? "style" : "script"
+      process.stderr.write(
+        `${file}:${block.line}: inline <${tag}> is not extracted; run house fix\n`
+      )
+      failed = true
+    }
+  }
+
+  return failed ? 1 : 0
 }
 
 function signoffLabel(reportFailure, contexts) {
@@ -505,10 +539,27 @@ export async function main(argv) {
 
   if (command === "hook") return runHook(positionals.slice(1), values, cwd)
 
+  if (command === "extract") {
+    if (values.write && values.check) {
+      process.stderr.write("house extract: choose --check or --write, not both\n")
+      return 2
+    }
+
+    const files = discoverFiles(cwd, positionals.slice(1))
+    const write = Boolean(values.write)
+    const { results, created } = extractFiles(files, cwd, { write })
+
+    if (write) {
+      for (const file of created) process.stdout.write(`house extract: wrote ${file}\n`)
+      return 0
+    }
+
+    return reportExtract(results)
+  }
+
   const runnable = command === "check" || command === "fix" || command === "signoff"
   const paths = runnable ? positionals.slice(1) : positionals
   const files = discoverFiles(cwd, paths)
-  const groups = groupByLane(files, cwd)
   const requested = requestedLanes(values)
   const selected = selectedLanes(requested)
 
@@ -518,6 +569,8 @@ export async function main(argv) {
   }
 
   if (values.list) {
+    const groups = groupByLane(files, cwd)
+
     if (values.json) {
       const listed = selected.map((lane) => ({
         id: lane.id,
@@ -548,6 +601,20 @@ export async function main(argv) {
     return 2
   }
 
+  // `house fix` extracts inline CSS and JS before the lanes are grouped, so
+  // the sibling files it creates are checked and formatted in this same run.
+  // Only the html lane owns extraction, and `--list` and `signoff` never get
+  // here in write mode.
+  let extraction = null
+  let runFiles = files
+
+  if (command === "fix" && selected.some((lane) => lane.id === "html")) {
+    extraction = extractFiles(files, cwd, { write: true })
+    if (extraction.created.length > 0) runFiles = [ ...files, ...extraction.created ]
+  }
+
+  const groups = groupByLane(runFiles, cwd)
+
   const toRun = selected
     .map((lane) => ({ lane, files: groups.get(lane.id) ?? [] }))
     .filter((entry) => entry.files.length > 0)
@@ -569,9 +636,20 @@ export async function main(argv) {
     return runSignoff({ laneResults, laneExit: exitCode, checked, values, color, cwd })
   }
 
+  const extracted = extraction === null ? null : summarizeExtraction(extraction)
+
   if (values.json) {
-    process.stdout.write(`${JSON.stringify(summarize(laneResults, command, checked, cwd, exitCode), null, 2)}\n`)
+    const report = summarize(laneResults, command, checked, cwd, exitCode)
+    if (extracted !== null) report.extraction = extracted
+    process.stdout.write(`${JSON.stringify(report, null, 2)}\n`)
     return exitCode
+  }
+
+  if (extracted !== null) {
+    process.stdout.write(
+      `house fix: extracted ${plural(extracted.blocks, "inline block")} from ` +
+      `${plural(extracted.htmlFiles, "HTML file")} into ${extracted.created.join(", ")}\n`
+    )
   }
 
   process.stdout.write(`${reportLanes(command, laneResults, checked, color, values.verbose).join("\n")}\n`)

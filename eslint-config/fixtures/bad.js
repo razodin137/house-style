@@ -6,32 +6,21 @@
  * violations are parse-time errors in strict module code.
  */
 
-import { parse } from "acorn"
-import dual from "./dual.js"
-import { first, missing } from "./dual.js"
-import { default as dualNamed } from "./dual.js"
+import dual, { first } from "./dual.js"
 import "./missing.js"
-import "./nested/../dual.js"
-import "./dual"
-import "./dual.js"
-import "/dual.js"
+import "../../../../../../../../dual.js"
 import "loader!./dual.js"
-import path from "path"
 import * as namespace from "./dual.js"
 import "./cycle-a.js"
-import selfImport from "./bad.js"
 import "../../stylelint-config-css/index.js"
 
 globalThis.first = dual
 globalThis.dualMember = dual.first
-
-import "./dual.js"
 globalThis.afterImport = 1
 
 const badFixtureSource = { name: "fixture" }
 
-const unexpectedMultiline = function () {}
-(globalThis)
+const unexpectedMultiline = (function () {}(globalThis))
 
 const multiStr = "first \
 second"
@@ -84,7 +73,7 @@ globalThis.constantBinary = constantBinary
 
 if (true) {}
 
-const controlRegex = /\x1f/
+const controlRegex = /\x1F/
 
 globalThis.controlRegex = controlRegex
 
@@ -128,7 +117,7 @@ try {
   error = 1
 }
 
-if (!!globalThis) {}
+if (globalThis) {}
 
 switch (1) {
   case 1:
@@ -156,7 +145,7 @@ const misleadingClass = /[👍]/
 
 globalThis.misleadingClass = misleadingClass
 
-const nativeNonconstructor = new Symbol()
+const nativeNonconstructor = Symbol()
 
 globalThis.nativeNonconstructor = nativeNonconstructor
 
@@ -182,7 +171,7 @@ var redeclared = 2
   globalThis.shadowRestricted = undefined
 }
 
-const regexSpaces = /a  b/
+const regexSpaces = /a {2}b/
 
 globalThis.regexSpaces = regexSpaces
 
@@ -230,7 +219,7 @@ const unsafeChaining = (globalThis?.value).toString()
 
 globalThis.unsafeChaining = unsafeChaining
 
-unusedLabel: globalThis.value = 1
+globalThis.value = 1
 
 class UnusedPrivate {
   #hidden = 1
@@ -307,8 +296,7 @@ function inconsistentReturn(flag) {
 
 globalThis.inconsistentReturn = inconsistentReturn
 
-if (globalThis)
-  globalThis.curly = 1
+if (globalThis) { globalThis.curly = 1 }
 
 switch (1) {
   default:
@@ -323,7 +311,7 @@ function defaultParamLast(value = 1, next) {
 
 globalThis.defaultParamLast = defaultParamLast
 
-const dotNotation = globalThis["name"]
+const dotNotation = globalThis.name
 
 globalThis.dotNotation = dotNotation
 
@@ -352,7 +340,7 @@ globalThis.SecondClass = SecondClass
 
 alert("hello")
 
-const arrayConstructor = new Array()
+const arrayConstructor = []
 
 globalThis.arrayConstructor = arrayConstructor
 
@@ -381,9 +369,8 @@ for (const key of []) {
 function elseReturn(flag) {
   if (flag) {
     return 1
-  } else {
-    return 2
   }
+  return 2
 }
 
 globalThis.elseReturn = elseReturn
@@ -392,14 +379,14 @@ eval("1")
 
 Array.prototype.value = 1
 
-const extraBind = (function () {
+const extraBind = function () {
   return 1
-}).bind(globalThis)
+}
 
 globalThis.extraBind = extraBind
 
-unusedOuter: for (const key of []) {
-  break unusedOuter
+for (const key of []) {
+  break
 }
 
 setTimeout("globalThis.value = 1", 10)
@@ -409,9 +396,9 @@ if (globalThis) {
 }
 
 const labelName = 1
-labelName: globalThis.value = labelName
+globalThis.value = labelName
 
-label: globalThis.value = 1
+globalThis.value = 1
 
 {
   globalThis.loneBlock = 1
@@ -463,9 +450,7 @@ const proto = ({}).__proto__
 
 globalThis.proto = proto
 
-isNaN("1")
-
-({}).__defineGetter__("key", () => 1)
+isNaN("1")({}).__defineGetter__("key", () => 1)
 
 function returnAssign() {
   return returnAssignValue = 1
@@ -498,19 +483,19 @@ globalThis.templateInString = templateInString
 
 throw "failed"
 
-let undefInit = undefined
+const undefInit = undefined
 globalThis.undefInit = undefInit
 
 const underscore = globalThis._private
 
 globalThis.underscore = underscore
 
-let unmodifiedCount = 0
+const unmodifiedCount = 0
 while (unmodifiedCount < 1) {
   globalThis.unmodifiedCount = unmodifiedCount
 }
 
-const unneededTernary = globalThis ? true : false
+const unneededTernary = !!globalThis
 
 globalThis.unneededTernary = unneededTernary
 
@@ -524,7 +509,7 @@ globalThis.useBeforeDefine = later
 
 const later = 1
 
-const computed = { ["key"]: 1 }
+const computed = { "key": 1 }
 
 globalThis.computed = computed
 
@@ -539,16 +524,16 @@ class UselessConstructor {
 globalThis.UselessConstructor = UselessConstructor
 
 const destructuredSource = { key: 1 }
-const { key: key } = destructuredSource
+const { key } = destructuredSource
 globalThis.key = key
 
 function uselessReturn() {
-  return
+
 }
 
 globalThis.uselessReturn = uselessReturn
 
-var oldStyle = 1
+const oldStyle = 1
 
 globalThis.oldStyle = oldStyle
 
@@ -557,39 +542,39 @@ const voidValue = void 0
 globalThis.voidValue = voidValue
 
 const shorthandKey = 1
-const shorthand = { shorthandKey: shorthandKey }
+const shorthand = { shorthandKey }
 
 globalThis.shorthand = shorthand
 
-const firstVar = 1, secondVar = 2
+const firstVar = 1; const secondVar = 2
 
 globalThis.firstVar = firstVar
 globalThis.secondVar = secondVar
 
-[ 1 ].map(function (value) {
-  return value
-})
+  [1].map((value) => {
+    return value
+  })
 
-let preferConst = 1
+const preferConst = 1
 globalThis.preferConst = preferConst
 
-const name = badFixtureSource.name
+const { name } = badFixtureSource
 
 globalThis.destructureMe = name
 
-const exponent = Math.pow(2, 3)
+const exponent = 2 ** 3
 
 globalThis.exponent = exponent
 
-const numericLiteral = parseInt("101", 2)
+const numericLiteral = 0b101
 
 globalThis.numericLiteral = numericLiteral
 
-const hasOwn = Object.prototype.hasOwnProperty.call(globalThis, "name")
+const hasOwn = Object.hasOwn(globalThis, "name")
 
 globalThis.hasOwn = hasOwn
 
-const objectSpread = Object.assign({}, badFixtureSource)
+const objectSpread = { ...badFixtureSource }
 
 globalThis.objectSpread = objectSpread
 
@@ -600,7 +585,7 @@ const regexLiteral = new RegExp("abc")
 globalThis.regexLiteral = regexLiteral
 
 function restParams() {
-  return arguments[ 0 ]
+  return arguments[0]
 }
 
 globalThis.restParams = restParams
@@ -618,7 +603,7 @@ const uselessCall = uselessCallTarget.call(null, 1)
 
 globalThis.uselessCall = uselessCall
 
-const template = "a" + globalThis.name
+const template = `a${globalThis.name}`
 
 globalThis.template = template
 
@@ -632,21 +617,21 @@ globalThis.symbolValue = symbolValue
 
 function varsOnTop() {
   globalThis.varsOnTop = 1
-  var lateVar = 1
+  const lateVar = 1
   return lateVar
 }
 
 globalThis.varsOnTop = varsOnTop
 
-if (1 === globalThis) {}
+if (globalThis === 1) {}
 
-const spreadEmpty = [ ...(globalThis.flag ? [] : "text") ]
+const spreadEmpty = [ ...(globalThis.flag ? "" : "text") ]
 
 globalThis.spreadEmpty = spreadEmpty
 
 throw new Error()
 
-const escapeCase = "\x0a"
+const escapeCase = "\x0A"
 
 globalThis.escapeCase = escapeCase
 
@@ -654,17 +639,17 @@ const booleanWrapper = new Boolean(true)
 
 globalThis.booleanWrapper = booleanWrapper
 
-if (globalThis instanceof Array) {}
+if (Array.isArray(globalThis)) {}
 
 const newArray = new Array(1)
 
 globalThis.newArray = newArray
 
-const newBuffer = new Buffer(1)
+const newBuffer = Buffer.alloc(1)
 
 globalThis.newBuffer = newBuffer
 
-const hexCase = 0XFF
+const hexCase = 0xFF
 
 globalThis.hexCase = hexCase
 
@@ -672,7 +657,7 @@ const textContent = document.querySelector("p").innerText
 
 globalThis.textContent = textContent
 
-const includes = [ 1 ].indexOf(1) !== -1
+const includes = [ 1 ].includes(1)
 
 globalThis.includes = includes
 
@@ -680,20 +665,20 @@ const numberProperty = isNaN("1")
 
 globalThis.numberProperty = numberProperty
 
-const startsWith = "abc".indexOf("a") === 0
+const startsWith = "abc".startsWith("a")
 
 globalThis.startsWith = startsWith
 
 function typeError(value) {
   if (typeof value !== "string") {
-    throw new Error("bad value")
+    throw new TypeError("bad value")
   }
   return value
 }
 
 globalThis.typeError = typeError
 
-throw Error("failed")
+throw new Error("failed")
 
 function useEffect(callback) {
   callback()
@@ -721,88 +706,89 @@ require(globalThis.name)
 
 module.exports = { first }
 
-export let mutableExport = 1
+export const mutableExport = 1
 
 const neverUsed = 1
 
 {
-  const list = [1, 2]
+  const list = [ 1, 2 ]
   globalThis.list = list
 }
 
 {
-  const arrow = value => value
+  const arrow = (value) => value
   globalThis.arrow = arrow
 }
 
 {
-  const arrowSpacing = (value)=>value
+  const arrowSpacing = (value) => value
   globalThis.arrowSpacing = arrowSpacing
 }
 
-if (globalThis) {globalThis.blockSpacing = 1}
+if (globalThis) { globalThis.blockSpacing = 1 }
 
-if (globalThis)
-{
+if (globalThis) {
   globalThis.braceStyle = 1
 }
 
 const trailingComma = {
-  key: 1,
+  key: 1
 }
 
 globalThis.trailingComma = trailingComma
 
-const commaSpacing = [ 1,2 ]
+const commaSpacing = [ 1, 2 ]
 
 globalThis.commaSpacing = commaSpacing
 
 const commaStyle = {
-  key: 1
-  , other: 2
+  key: 1,
+  other: 2
 }
 
 globalThis.commaStyle = commaStyle
 
-const computedSpacing = { [ "key" ]: 1 }
+const computedSpacing = { "key": 1 }
 
 globalThis.computedSpacing = computedSpacing
 
-const dotLocation = globalThis.
-  name
+const dotLocation = globalThis
+  .name
 
 globalThis.dotLocation = dotLocation
 
-function*generatorStar() {}
+function* generatorStar() {}
 
 globalThis.generatorStar = generatorStar
 
 if (globalThis) {
-    globalThis.indent = 1
+  globalThis.indent = 1
 }
 
 const indentBinary = 1 +
-1
+  1
 
 globalThis.indentBinary = indentBinary
 
-const keySpacing = { key:1 }
+const keySpacing = { key: 1 }
 
 globalThis.keySpacing = keySpacing
 
 const objectPropertyNewline = {
-  first: 1, second: 2,
+  first: 1,
+  second: 2,
   third: 3
 }
 
 globalThis.objectPropertyNewline = objectPropertyNewline
 
-if(globalThis) {}
+if (globalThis) {}
 
 class ClassMembers {
   first() {
     return 1
   }
+
   second() {
     return 2
   }
@@ -812,22 +798,23 @@ globalThis.ClassMembers = ClassMembers
 
 if (globalThis) globalThis.statementsPerLine = 1
 
-const multilineTernary = globalThis ?
-  1 : 2
+const multilineTernary = globalThis
+  ? 1
+  : 2
 
 globalThis.multilineTernary = multilineTernary
 
-const newParens = new Date
+const newParens = new Date()
 
 globalThis.newParens = newParens
 
-const extraParens = (function () {
+const extraParens = function () {
   return 1
-})
+}
 
 globalThis.extraParens = extraParens
 
-const floatingDecimal = .5
+const floatingDecimal = 0.5
 
 globalThis.floatingDecimal = floatingDecimal
 
@@ -835,132 +822,136 @@ const mixedOperators = globalThis && 1 || 2
 
 globalThis.mixedOperators = mixedOperators
 
-	  const mixedSpaces = 1
+const mixedSpaces = 1
 
 globalThis.mixedSpaces = mixedSpaces
 
-const multiSpaces  = 1
+const multiSpaces = 1
 
 globalThis.multiSpaces = multiSpaces
 
 const multipleEmptyLines = 1
 
-
-
 globalThis.multipleEmptyLines = multipleEmptyLines
 
-const trailingSpaces = 1   
+const trailingSpaces = 1
 
 globalThis.trailingSpaces = trailingSpaces
 
-const whitespaceBeforeProperty = globalThis .name
+const whitespaceBeforeProperty = globalThis.name
 
 globalThis.whitespaceBeforeProperty = whitespaceBeforeProperty
 
-const objectCurlySpacing = {key: 1}
+const objectCurlySpacing = { key: 1 }
 
 globalThis.objectCurlySpacing = objectCurlySpacing
 
-const operatorLinebreak = 1
-  + 2
+const operatorLinebreak = 1 +
+  2
 
 globalThis.operatorLinebreak = operatorLinebreak
 
 function paddedBlocks() {
-
   return 1
 }
 
 globalThis.paddedBlocks = paddedBlocks
 
-const singleQuotes = 'single'
+const singleQuotes = "single"
 
 globalThis.singleQuotes = singleQuotes
 
-const restSpread = (... args) => args
+const restSpread = (...args) => args
 
 globalThis.restSpread = restSpread
 
-const semi = 1;
+const semi = 1
 
 globalThis.semi = semi
 
-const semiSpacing = 1 ;
+const semiSpacing = 1
 
 globalThis.semiSpacing = semiSpacing
 
-if (globalThis){ globalThis.spaceBeforeBlocks = 1 }
+if (globalThis) { globalThis.spaceBeforeBlocks = 1 }
 
-function spaceBeforeFunctionParen () {
+function spaceBeforeFunctionParen() {
   return 1
 }
 
 globalThis.spaceBeforeFunctionParen = spaceBeforeFunctionParen
 
-spaceInParens( 1 )
+spaceInParens(1)
 
 function spaceInParens(value) {
   return value
 }
 
-const callSpacing = spaceInParens (1)
+const callSpacing = spaceInParens(1)
 
 globalThis.callSpacing = callSpacing
 
-const infixOps = 1+2
+const infixOps = 1 + 2
 
 globalThis.infixOps = infixOps
 
-const unaryOps = - 1
+const unaryOps = -1
 
 globalThis.unaryOps = unaryOps
 
-//comment
+// comment
 
-const templateCurlySpacing = `value: ${ globalThis.name }`
+const templateCurlySpacing = `value: ${globalThis.name}`
 
 globalThis.templateCurlySpacing = templateCurlySpacing
 
-const templateTagSpacing = String.raw `text`
+const templateTagSpacing = String.raw`text`
 
 globalThis.templateTagSpacing = templateTagSpacing
 
 function* yieldStar() {
-  yield*[ 1 ]
+  yield* [ 1 ]
 }
 
 globalThis.yieldStar = yieldStar
 
 const jsxClosingBracket = (
   <div
-    id="closing-bracket"></div>
+    id="closing-bracket"
+  >
+  </div>
 )
 
 const jsxClosingTag = (
   <div>
     text
-    </div>
-)
-
-const jsxCurlyBracePresence = <div id={"value"} />
-
-const jsxCurlyNewline = (
-  <div>
-    { "text"
-    }
   </div>
 )
 
-const jsxCurlySpacing = <div id={ "value" } />
+const jsxCurlyBracePresence = <div id="value" />
 
-const jsxEqualsSpacing = <div id = "value" />
+const jsxCurlyNewline = (
+  <div>
+    text
+  </div>
+)
 
-const jsxFirstPropNewLine = <div id="first"
-  className="second" />
+const jsxCurlySpacing = <div id="value" />
 
-const jsxFunctionCallNewline = foo(<div>
-  text
-</div>)
+const jsxEqualsSpacing = <div id="value" />
+
+const jsxFirstPropNewLine = (
+  <div
+    id="first"
+    className="second"
+  />
+)
+
+const jsxFunctionCallNewline = foo(
+  <div>
+    text
+  </div>
+)
 
 function foo(node) {
   return node
@@ -968,27 +959,33 @@ function foo(node) {
 
 const jsxIndentProps = (
   <div
-      id="indent-props"
+    id="indent-props"
   />
 )
 
 const jsxMaxPropsPerLine = (
   <div
-    id="one" className="two"
+    id="one"
+    className="two"
   />
 )
 
 const jsxOneExpressionPerLine = (
-  <div>text<span /></div>
+  <div>
+    text
+    <span />
+  </div>
 )
 
-const jsxQuotes = <div id='jsx-quotes' />
+const jsxQuotes = <div id="jsx-quotes" />
 
-const jsxTagSpacing = <div/>
+const jsxTagSpacing = <div />
 
-const jsxWrapMultilines = <div>
-  text
-</div>
+const jsxWrapMultilines = (
+  <div>
+    text
+  </div>
+)
 
 globalThis.jsx = [
   jsxClosingBracket, jsxClosingTag, jsxCurlyBracePresence, jsxCurlyNewline,

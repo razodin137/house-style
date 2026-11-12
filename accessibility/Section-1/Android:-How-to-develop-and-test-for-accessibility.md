@@ -6,7 +6,6 @@ While the core principles around developing and testing for accessibility apply 
 2. [Run through the app using TalkBack screen reader](#run-through-the-app-using-talkback-screen-reader)
 3. [Additional Resources](#additional-resources)
 
-
 ## Run an accessibility validation tool on each screen of the app
 
 There are two great tools you can run against each screen of the app to check for accessibility issues. Failures from these tests usually cover touch point sizes that are under-spec, missing or duplicate element names or descriptions, and low color contrast.

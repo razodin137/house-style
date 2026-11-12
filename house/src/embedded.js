@@ -138,7 +138,18 @@ function formatBlock(prettier, config, file, extension, content) {
   return result.stdout
 }
 
-function report(files, write, prettier, config) {
+function hasSupportedBlocks(text) {
+  let found = false
+
+  text.replace(BLOCK, (match, tag, attrs, content) => {
+    if (extensionFor(tag, attrs) !== null && content.trim() !== "") found = true
+    return match
+  })
+
+  return found
+}
+
+function report(files, write, config, findPrettier) {
   let failed = false
 
   for (const file of files) {
@@ -152,6 +163,21 @@ function report(files, write, prettier, config) {
     }
 
     if (text !== null) {
+      // An HTML file with nothing inline is already acceptable, so it must
+      // not require Prettier just because this lane ran.
+      if (!hasSupportedBlocks(text)) continue
+
+      const prettier = findPrettier()
+      if (!prettier) {
+        process.stderr.write(
+          write
+            ? `${file}: inline blocks need prettier to format them\n`
+            : `${file}: inline blocks need prettier to check formatting; run house fix\n`
+        )
+        failed = true
+        continue
+      }
+
       const result = formatEmbedded(text, (extension, content) =>
         formatBlock(prettier, config, file, extension, content)
       )
@@ -195,13 +221,13 @@ function main(argv) {
     }
   }
 
-  const prettier = findTool("prettier", process.cwd())
-  if (!prettier) {
-    process.stderr.write("prettier is not installed or not on PATH\n")
-    return 2
+  let prettier
+  const findPrettier = () => {
+    if (prettier === undefined) prettier = findTool("prettier", process.cwd())
+    return prettier
   }
 
-  return report(files, write, prettier, config)
+  return report(files, write, config, findPrettier)
 }
 
 const isMain =

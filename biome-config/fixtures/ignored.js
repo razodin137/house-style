@@ -1,4 +1,4 @@
-const tags = [ "a", "b" ];
-let greeting = 'hello';
+const tags = [ "a", "b" ]
+const greeting = "hello"
 
-console.log(greeting, tags);
+console.log(greeting, tags)

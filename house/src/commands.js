@@ -1,10 +1,31 @@
 import { existsSync } from "node:fs"
 import { join } from "node:path"
 import { houseRoot } from "./paths.js"
-import { findTool } from "./run.js"
+
+const EMBEDDED = join(houseRoot, "src", "embedded.js")
 
 function step(tool, args, label) {
   return { tool, args, label: label ?? tool }
+}
+
+// Extraction happens before the lanes run, so after it the only supported
+// blocks left inline are JSON-like ones. `--write` formats those in place.
+// Check accepts either layout: no blocks, or blocks Prettier already agrees
+// with. Nothing is written in check mode.
+function embeddedStep(files, prettier, mode) {
+  const base = withConfig([], prettier)
+  return step(process.execPath, [ EMBEDDED, mode, ...base, ...files ], "embedded blocks")
+}
+
+function embeddedPlan(files, prettier, fix) {
+  if (fix) {
+    return {
+      fix: [ embeddedStep(files, prettier, "--write") ],
+      check: [ embeddedStep(files, prettier, "--check") ]
+    }
+  }
+
+  return { fix: [], check: [ embeddedStep(files, prettier, "--check") ] }
 }
 
 function withConfig(base, config) {
@@ -43,27 +64,13 @@ function stylePlan(files, config, prettier, fix) {
   }
 }
 
-function embeddedPlan(files, prettier, cwd, fix) {
-  if (!findTool("prettier", cwd)) {
-    return { fix: [], check: [ step("prettier", [], "embedded blocks") ] }
-  }
-
-  const base = [ join(houseRoot, "src", "embedded.js"), ...withConfig([], prettier) ]
-  const run = (mode) => step(process.execPath, [ ...base, mode, ...files ], "embedded blocks")
-
-  if (fix) {
-    return {
-      fix: [ run("--write") ],
-      check: [ run("--check") ]
-    }
-  }
-
-  return { fix: [], check: [ run("--check") ] }
-}
-
-function htmlPlan(files, config, prettier, cwd, fix) {
+function htmlPlan(files, config, prettier, fix) {
   const base = withConfig([], config)
-  const embedded = embeddedPlan(files, prettier, cwd, fix)
+  const embedded = embeddedPlan(files, prettier, fix)
+  const check = [
+    ...embedded.check,
+    step("html-validate", [ ...base, ...files ])
+  ]
 
   if (fix) {
     return {
@@ -71,20 +78,11 @@ function htmlPlan(files, config, prettier, cwd, fix) {
         step("html-validate", [ ...base, "--fix", ...files ]),
         ...embedded.fix
       ],
-      check: [
-        ...embedded.check,
-        step("html-validate", [ ...base, ...files ])
-      ]
+      check
     }
   }
 
-  return {
-    fix: [],
-    check: [
-      ...embedded.check,
-      step("html-validate", [ ...base, ...files ])
-    ]
-  }
+  return { fix: [], check }
 }
 
 function biomePlan(files, config, fix) {
@@ -159,7 +157,7 @@ function pythonPlan(files, config, fix) {
 export function buildPlan(lane, files, { config, prettier, cwd, fix }) {
   if (lane === "js") return eslintPlan(files, config, fix)
   if (lane === "css" || lane === "scss") return stylePlan(files, config, prettier, fix)
-  if (lane === "html") return htmlPlan(files, config, prettier, cwd, fix)
+  if (lane === "html") return htmlPlan(files, config, prettier, fix)
   if (lane === "md" || lane === "yaml") return biomePlan(files, config, fix)
   if (lane === "ruby") return rubyPlan(files, config, cwd, fix)
   if (lane === "shell") return shellPlan(files, fix)
