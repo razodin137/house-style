@@ -107,6 +107,8 @@ export default [
 
 ```
 
+The [fixtures](/eslint-config/fixtures) pin the ruleset: `good.js` and `good.jsx` pass clean, `unformatted.js` and `unformatted.jsx` reformat to exactly their pinned good output, and `bad.js` fails with at least one violation per rule that can fire in module JavaScript. The rules that cannot fire there — the TypeScript stylistic rules, and the ones whose violations are parse-time errors in strict mode — are listed with their reasons in the test. Run them from the package directory with `npm test`.
+
 ## CSS
 
 We use [Stylelint](https://stylelint.io) for our CSS. You'll need Stylelint 17 or higher to use our shared config.
@@ -349,3 +351,10 @@ There's no config registry for ruff either, so adoption is vendoring: copy [`ruf
 
 The [fixtures](/python/fixtures) pin the ruleset: `good.py` passes clean, and `bad.py` fails with the pinned diagnostics while its planted unused argument stays silent. Run them from the directory with `./test/verify.sh`.
 
+## Development
+
+The packages are npm workspaces. Run every package's fixtures from the repository root:
+
+```bash
+npm test --workspaces --if-present
+```

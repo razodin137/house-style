@@ -1,0 +1,21 @@
+{
+  "name": "house-style",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/razodin137/house-style.git"
+  },
+  "workspaces": [
+    "biome-config",
+    "eslint-config",
+    "house",
+    "html-validate-config",
+    "prettier-config",
+    "shot",
+    "stylelint-config-css",
+    "stylelint-config-scss",
+    "stylelint-config-tokens"
+  ]
+}

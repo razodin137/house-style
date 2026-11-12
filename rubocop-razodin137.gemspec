@@ -15,5 +15,5 @@ Gem::Specification.new do |s|
   s.add_dependency "rubocop-performance", ">= 1.27"
   s.add_dependency "rubocop-minitest", ">= 0.41"
 
-  s.files = %w[ rubocop.yml rubocop-ruby.yml lib/rubocop-razodin137.rb ]
+  s.files = %w[ LICENSE rubocop.yml rubocop-ruby.yml lib/rubocop-razodin137.rb ]
 end
