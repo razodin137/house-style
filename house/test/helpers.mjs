@@ -4,7 +4,8 @@ import { fileURLToPath } from "node:url"
 import { spawnSync } from "node:child_process"
 
 const here = dirname(fileURLToPath(import.meta.url))
-const bin = resolve(here, "..", "bin", "house.js")
+export const houseDir = resolve(here, "..")
+const bin = resolve(houseDir, "bin", "house.js")
 const scratch = join(here, ".tmp")
 
 const CONFIG_PACKAGES = {
@@ -15,11 +16,15 @@ const CONFIG_PACKAGES = {
   "@razodin137/html-validate-config": { main: "index.js", body: "module.exports = { rules: {} }\n" }
 }
 
-const FAKE_TOOL = `#!/usr/bin/env node
+const FAKE_TOOL = `#!/bin/sh
+exec node "$(dirname "$0")/.fake-tool.cjs" "$(basename "$0")" "$@"
+`
+
+const FAKE_TOOL_BODY = `#!/usr/bin/env node
 const fs = require("node:fs")
 
-const tool = process.argv[1].split("/").pop()
-const args = process.argv.slice(2)
+const tool = process.argv[2]
+const args = process.argv.slice(3)
 
 if (process.env.HOUSE_LOG) {
   fs.appendFileSync(process.env.HOUSE_LOG, JSON.stringify({ tool, args }) + "\\n")
@@ -44,26 +49,32 @@ export function makeProject({ files = {}, configs = true } = {}) {
     writeFileSync(target, content)
   }
 
-  if (configs) {
-    for (const [ name, pkg ] of Object.entries(CONFIG_PACKAGES)) {
-      const directory = join(root, "node_modules", name)
-      mkdirSync(directory, { recursive: true })
-      writeFileSync(join(directory, "package.json"), JSON.stringify({
-        name,
-        version: "0.1.0",
-        main: pkg.main,
-        ...(pkg.type ? { type: pkg.type } : {})
-      }))
-      writeFileSync(join(directory, pkg.main), pkg.body)
-    }
+  let selected = configs
+  if (configs === true) selected = Object.keys(CONFIG_PACKAGES)
+  if (configs === false) selected = []
+
+  for (const name of selected) {
+    const pkg = CONFIG_PACKAGES[name]
+    const directory = join(root, "node_modules", name)
+    mkdirSync(directory, { recursive: true })
+    writeFileSync(join(directory, "package.json"), JSON.stringify({
+      name,
+      version: "0.1.0",
+      main: pkg.main,
+      ...(pkg.type ? { type: pkg.type } : {})
+    }))
+    writeFileSync(join(directory, pkg.main), pkg.body)
   }
 
+  spawnSync("git", [ "init", "-q" ], { cwd: root })
+  writeFileSync(join(root, ".gitignore"), "node_modules/\n.fake-bin/\n.invocations.jsonl\n")
   return root
 }
 
-export function makeTools(root, names = [ "eslint", "stylelint", "prettier", "html-validate", "rubocop", "bundle", "shellcheck", "shfmt", "ruff" ]) {
+export function makeTools(root, names = [ "eslint", "stylelint", "prettier", "html-validate", "rubocop", "bundle", "shellcheck", "shfmt", "ruff", "gh" ]) {
   const directory = join(root, ".fake-bin")
   mkdirSync(directory, { recursive: true })
+  writeFileSync(join(directory, ".fake-tool.cjs"), FAKE_TOOL_BODY)
 
   for (const name of names) {
     const file = join(directory, name)

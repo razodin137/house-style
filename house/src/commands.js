@@ -41,10 +41,19 @@ function stylePlan(files, config, prettier, fix) {
   }
 }
 
-function htmlPlan(files, config) {
+function htmlPlan(files, config, fix) {
+  const base = withConfig([], config)
+
+  if (fix) {
+    return {
+      fix: [ step("html-validate", [ ...base, "--fix", ...files ]) ],
+      check: [ step("html-validate", [ ...base, ...files ]) ]
+    }
+  }
+
   return {
     fix: [],
-    check: [ step("html-validate", [ ...withConfig([], config), ...files ]) ]
+    check: [ step("html-validate", [ ...base, ...files ]) ]
   }
 }
 
@@ -104,7 +113,7 @@ function pythonPlan(files, config, fix) {
 export function buildPlan(lane, files, { config, prettier, cwd, fix }) {
   if (lane === "js") return eslintPlan(files, config, fix)
   if (lane === "css" || lane === "scss") return stylePlan(files, config, prettier, fix)
-  if (lane === "html") return htmlPlan(files, config)
+  if (lane === "html") return htmlPlan(files, config, fix)
   if (lane === "ruby") return rubyPlan(files, config, cwd, fix)
   if (lane === "shell") return shellPlan(files, fix)
   if (lane === "python") return pythonPlan(files, config, fix)

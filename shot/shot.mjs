@@ -44,17 +44,27 @@ Config file:
 function parseArgs(argv) {
   const options = { pages: [], update: false }
 
-  for (let index = 0; index < argv.length; index++) {
+  for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index]
 
     if (arg === "--update" || arg === "-u") options.update = true
     else if (arg === "--help" || arg === "-h") options.help = true
-    else if (arg === "--base-url") options.baseURL = argv[++index]
-    else if (arg === "--out" || arg === "-o") options.out = argv[++index]
-    else if (arg === "--config" || arg === "-c") options.config = argv[++index]
-    else if (arg === "--widths") options.widths = argv[++index].split(",").map(Number)
-    else if (arg === "--tolerance") options.tolerance = Number(argv[++index])
-    else if (arg.startsWith("-")) throw new Error(`Unknown option "${arg}"`)
+    else if (arg === "--base-url") {
+      index += 1
+      options.baseURL = argv[index]
+    } else if (arg === "--out" || arg === "-o") {
+      index += 1
+      options.out = argv[index]
+    } else if (arg === "--config" || arg === "-c") {
+      index += 1
+      options.config = argv[index]
+    } else if (arg === "--widths") {
+      index += 1
+      options.widths = argv[index].split(",").map(Number)
+    } else if (arg === "--tolerance") {
+      index += 1
+      options.tolerance = Number(argv[index])
+    } else if (arg.startsWith("-")) throw new Error(`Unknown option "${arg}"`)
     else options.pages.push(arg)
   }
 
@@ -143,7 +153,7 @@ async function capture(browser, target, width, height) {
 function pad(image, width, height) {
   const data = new Uint8Array(width * height * 4)
 
-  for (let y = 0; y < image.height; y++) {
+  for (let y = 0; y < image.height; y += 1) {
     const from = y * image.width * 4
     data.set(image.data.subarray(from, from + image.width * 4), y * width * 4)
   }
@@ -212,35 +222,30 @@ async function run(options) {
         await rm(actualFile, { force: true })
         await rm(diffFile, { force: true })
         console.log(`  ${width}   baseline written`)
-        continue
-      }
-
-      if (!existsSync(baselineFile)) {
+      } else if (!existsSync(baselineFile)) {
         failures.push({ slug, width, reason: "missing baseline" })
         console.log(`  ${width}   FAIL   missing baseline (run with --update)`)
-        continue
+      } else {
+        const baseline = await readFile(baselineFile)
+        const { changed, total, diff } = compare(baseline, image)
+
+        if (changed / total <= tolerance) {
+          await rm(actualFile, { force: true })
+          await rm(diffFile, { force: true })
+          console.log(`  ${width}   ok`)
+        } else {
+          await mkdir(directory, { recursive: true })
+          await writeFile(actualFile, image)
+          await writeFile(diffFile, diff)
+
+          failures.push({ slug, width, reason: "difference" })
+
+          console.log(`  ${width}   FAIL   ${formatCount(changed)} of ${formatCount(total)} px differ (${(changed / total * 100).toFixed(2)}%)`)
+          console.log(`         baseline  ${baselineFile}`)
+          console.log(`         actual    ${actualFile}`)
+          console.log(`         diff      ${diffFile}`)
+        }
       }
-
-      const baseline = await readFile(baselineFile)
-      const { changed, total, diff } = compare(baseline, image)
-
-      if (changed / total <= tolerance) {
-        await rm(actualFile, { force: true })
-        await rm(diffFile, { force: true })
-        console.log(`  ${width}   ok`)
-        continue
-      }
-
-      await mkdir(directory, { recursive: true })
-      await writeFile(actualFile, image)
-      await writeFile(diffFile, diff)
-
-      failures.push({ slug, width, reason: "difference" })
-
-      console.log(`  ${width}   FAIL   ${formatCount(changed)} of ${formatCount(total)} px differ (${(changed / total * 100).toFixed(2)}%)`)
-      console.log(`         baseline  ${baselineFile}`)
-      console.log(`         actual    ${actualFile}`)
-      console.log(`         diff      ${diffFile}`)
     }
   }
 

@@ -1,4 +1,4 @@
-'use strict';
+"use strict"
 
 module.exports = {
   extends: "stylelint-config-recommended-scss",
@@ -9,4 +9,4 @@ module.exports = {
     "scss/comment-no-empty": null,
     "scss/no-global-function-names": null
   }
-};
+}

@@ -11,6 +11,8 @@ const expected = [
   "no-dup-id",
   "no-implicit-button-type",
   "no-inline-style",
+  "no-missing-references",
+  "svg-focusable",
   "valid-for",
   "void-style",
   "wcag/h37"

@@ -20,8 +20,11 @@ const IGNORED_DIRS = new Set([
   "tmp",
   "vendor"
 ])
-
 const MAX_HEAD = 256
+
+function isIgnoredPath(file) {
+  return file.split("/").some((segment) => IGNORED_DIRS.has(segment))
+}
 
 function toPosix(file) {
   return file.split(sep).join("/")
@@ -47,7 +50,7 @@ function walk(directory, cwd) {
   const files = []
 
   function visit(absolute) {
-    let entries = []
+    let entries
     try {
       entries = readdirSync(absolute, { withFileTypes: true })
     } catch {
@@ -57,14 +60,13 @@ function walk(directory, cwd) {
     entries.sort((a, b) => a.name.localeCompare(b.name))
 
     for (const entry of entries) {
-      if (entry.isSymbolicLink()) continue
-
-      const child = join(absolute, entry.name)
-      if (entry.isDirectory()) {
-        if (IGNORED_DIRS.has(entry.name)) continue
-        visit(child)
-      } else if (entry.isFile()) {
-        files.push(toPosix(relative(cwd, child)))
+      if (!entry.isSymbolicLink()) {
+        const child = join(absolute, entry.name)
+        if (entry.isDirectory()) {
+          if (!IGNORED_DIRS.has(entry.name)) visit(child)
+        } else if (entry.isFile()) {
+          files.push(toPosix(relative(cwd, child)))
+        }
       }
     }
   }
@@ -96,6 +98,7 @@ export function discoverFiles(cwd, inputs) {
   function add(file) {
     const normalized = toPosix(file)
     if (!normalized || seen.has(normalized)) return
+    if (isIgnoredPath(normalized)) return
     if (!existsSync(resolve(cwd, normalized))) return
     seen.add(normalized)
     files.push(normalized)
@@ -104,12 +107,13 @@ export function discoverFiles(cwd, inputs) {
   if (inputs.length > 0) {
     for (const input of inputs) {
       const absolute = resolve(cwd, input)
-      if (!existsSync(absolute)) continue
 
-      if (statSync(absolute).isDirectory()) {
-        for (const file of walk(absolute, cwd)) add(file)
-      } else {
-        add(input)
+      if (existsSync(absolute)) {
+        if (statSync(absolute).isDirectory()) {
+          for (const file of walk(absolute, cwd)) add(file)
+        } else {
+          add(input)
+        }
       }
     }
   } else {
@@ -130,11 +134,12 @@ export function groupByLane(files, cwd) {
   for (const file of files) {
     const head = headOf(file, resolve(cwd, file))
     const lane = detectLane(file, head)
-    if (!lane) continue
 
-    const group = groups.get(lane.id) ?? []
-    group.push(file)
-    groups.set(lane.id, group)
+    if (lane) {
+      const group = groups.get(lane.id) ?? []
+      group.push(file)
+      groups.set(lane.id, group)
+    }
   }
 
   return groups
