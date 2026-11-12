@@ -1,0 +1,214 @@
+/*
+ * One violation per rule enforced by @37signals/stylelint-config-css.
+ *
+ * Two enabled rules cannot fire in this file: "comment-no-empty" is turned
+ * off by this config (see fixtures/good.css), and "no-empty-source" only
+ * fires on an empty source.
+ */
+
+/* no-duplicate-at-import-rules */
+@import "dup.css";
+@import "dup.css";
+
+/* at-rule-no-unknown */
+@totally-unknown {
+  width: 100%;
+}
+
+/* at-rule-no-deprecated */
+@document url-prefix("https://") {
+  .in-document { color: red }
+}
+
+/* at-rule-descriptor-no-unknown */
+@font-face {
+  not-a-descriptor: 1;
+}
+
+/* at-rule-descriptor-value-no-unknown */
+@font-face {
+  font-display: notavalue;
+}
+
+/* at-rule-prelude-no-invalid */
+@keyframes 1abc {
+  from { opacity: 0 }
+}
+
+/* syntax-string-no-invalid */
+@property --bad-syntax {
+  syntax: "<made-up>";
+  inherits: false;
+}
+
+/* block-no-empty */
+.empty {
+}
+
+/* custom-property-no-missing-var-function */
+.custom-prop {
+  --brand: red;
+  font-family: --brand, serif;
+}
+
+/* declaration-block-no-duplicate-custom-properties */
+.dup-custom {
+  --dup: 1;
+  --dup: 2;
+}
+
+/* declaration-block-no-duplicate-properties */
+.dup-props {
+  color: red;
+  color: blue;
+}
+
+/* declaration-block-no-shorthand-property-overrides */
+.shorthand-override {
+  padding-top: 1px;
+  padding: 2px;
+}
+
+/* declaration-property-value-keyword-no-deprecated */
+.deprecated-value {
+  color: window;
+}
+
+/* declaration-property-value-no-unknown */
+.unknown-value {
+  color: notacolor;
+}
+
+/* font-family-no-duplicate-names */
+.dup-font-names {
+  font-family: Arial, Arial, serif;
+}
+
+/* font-family-no-missing-generic-family-keyword */
+.missing-generic {
+  font-family: Arial;
+}
+
+/* function-calc-no-unspaced-operator */
+.calc-unspaced {
+  width: calc(1px +2px);
+}
+
+/* keyframe-block-no-duplicate-selectors */
+@keyframes dupkf {
+  0% { opacity: 0 }
+  0% { opacity: 1 }
+}
+
+/* keyframe-declaration-no-important */
+@keyframes importantkf {
+  from { opacity: 0 !important }
+}
+
+/* media-feature-name-no-unknown */
+@media (not-a-feature: 1) {
+  .media-unknown-feature { color: red }
+}
+
+/* media-feature-name-value-no-unknown */
+@media (orientation: diagonal) {
+  .media-unknown-value { color: red }
+}
+
+/* media-query-no-invalid */
+@media (min-width) {
+  .media-invalid { color: red }
+}
+
+/* media-type-no-deprecated */
+@media tty {
+  .media-deprecated { color: red }
+}
+
+/* named-grid-areas-no-invalid */
+.grid-areas {
+  grid-template-areas: "a a" "b b b";
+}
+
+/* nesting-selector-no-missing-scoping-root */
+& .nested {
+  color: red;
+}
+
+/* no-descending-specificity */
+.specificity a {
+  color: red;
+}
+
+a {
+  color: blue;
+}
+
+/* no-duplicate-selectors */
+.dup-selector {
+  color: red;
+}
+
+.dup-selector {
+  color: blue;
+}
+
+/* no-invalid-position-at-import-rule */
+.import-late {
+  color: red;
+}
+
+@import "late.css";
+
+/* no-invalid-position-declaration */
+color: red;
+
+/* no-irregular-whitespace (U+00A0 between selector and brace) */
+.irregular {
+  color: red;
+}
+
+/* property-no-deprecated */
+.deprecated-prop {
+  word-wrap: break-word;
+}
+
+/* property-no-unknown */
+.unknown-prop {
+  made-up-property: 1;
+}
+
+/* selector-anb-no-unmatchable */
+.anb li:nth-child(0n+0) {
+  color: red;
+}
+
+/* selector-pseudo-class-no-unknown */
+a:madeup-class {
+  color: red;
+}
+
+/* selector-pseudo-element-no-unknown */
+a::madeup-element {
+  color: red;
+}
+
+/* selector-type-no-unknown */
+madeuptag {
+  color: red;
+}
+
+/* string-no-newline */
+[href="line1
+line2"] {
+  color: red;
+}
+
+/* annotation-no-unknown */
+.annotation {
+  --annotated: red !unknown;
+}
+
+/* no-invalid-double-slash-comments */
+// not a css comment
+.sacrificial { color: red }

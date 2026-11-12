@@ -1,0 +1,81 @@
+/*
+ * This file passes @37signals/stylelint-config-css cleanly.
+ * The empty comment below is allowed: this config turns "comment-no-empty"
+ * off, making stylelint-config-recommended a little more lax.
+ */
+
+/* */
+
+@import "base.css";
+
+@property --brand-color {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #b3261e;
+}
+
+:root {
+  --accent: #2f68b3;
+}
+
+@font-face {
+  font-family: "House Sans";
+  src: url("house-sans.woff2") format("woff2");
+  font-display: swap;
+}
+
+@keyframes fade {
+  from { opacity: 0 }
+  to { opacity: 1 }
+}
+
+@media print {
+  .print-only { display: none }
+}
+
+@media (min-width: 40em) {
+  .sidebar { display: block }
+}
+
+html {
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+.button {
+  color: var(--brand-color);
+  padding: calc(0.5em + 2px) calc(1em + 4px);
+}
+
+.badge {
+  color: var(--accent);
+}
+
+[data-visible="true"] {
+  visibility: visible;
+}
+
+.menu li:nth-child(2n+1) {
+  background: canvas;
+}
+
+.parent {
+  & .child { color: var(--accent) }
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.modal::backdrop {
+  opacity: 0.5;
+}
+
+.layout {
+  grid-template-areas:
+    "header header"
+    "sidebar main";
+}
+
+.wrap {
+  overflow-wrap: break-word;
+}

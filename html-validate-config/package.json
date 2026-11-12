@@ -1,0 +1,35 @@
+{
+  "name": "@37signals/html-validate-config",
+  "version": "0.1.0",
+  "author": "37signals",
+  "license": "MIT",
+  "description": "37signals house style for HTML",
+  "keywords": [
+    "html-validate",
+    "html-validate-config",
+    "html"
+  ],
+  "homepage": "https://github.com/razodin137/house-style",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/razodin137/house-style.git",
+    "directory": "html-validate-config"
+  },
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "index.js",
+  "files": [
+    "index.js"
+  ],
+  "devDependencies": {
+    "html-validate": "^11.21.0"
+  },
+  "peerDependencies": {
+    "html-validate": "^11.0.0"
+  },
+  "engines": {
+    "node": "^22.22.0 || >= 24.8.0"
+  }
+}

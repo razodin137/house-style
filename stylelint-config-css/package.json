@@ -23,6 +23,9 @@
   "files": [
     "index.js"
   ],
+  "scripts": {
+    "test": "node test/verify.mjs"
+  },
   "dependencies": {
     "stylelint-config-recommended": "^18.0.0"
   },

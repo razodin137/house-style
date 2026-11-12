@@ -60,6 +60,34 @@ export default [
 
 ```
 
+## CSS
+
+We use [Stylelint](https://stylelint.io) for our CSS. You'll need Stylelint 17 or higher to use our shared config.
+
+Our config extends [stylelint-config-recommended](https://github.com/stylelint/stylelint-config-recommended) and makes it a little more lax.
+
+To see the rules, read the [config itself](/stylelint-config-css/index.js).
+
+To use our small ruleset as a baseline, add the `@37signals/stylelint-config-css` package:
+```bash
+npm install --save-dev @37signals/stylelint-config-css
+
+# or
+yarn add --dev @37signals/stylelint-config-css
+```
+And extend it in your Stylelint config:
+```json
+{
+  "extends": "@37signals/stylelint-config-css",
+
+  "rules": {
+    …
+  }
+}
+```
+
+The [fixtures](/stylelint-config-css/fixtures) pin the ruleset: `good.css` passes clean, and `bad.css` fails with one violation per rule. Run them from the package directory with `npm test`.
+
 ## SCSS
 
 We use [Stylelint](https://stylelint.io) for our SCSS. You'll need Stylelint 17 or higher to use our shared config.
